@@ -1,3 +1,15 @@
+// view.bindTo(other, {
+//   top: true|'top', 'bottom', function
+// })
+// 
+// 
+// 
+// view.bindTo(view , function (bind) {
+//   bind.top = function (other, otherRect, otherOuterRect) {
+//     
+//   }
+// })
+
 /*
 
 

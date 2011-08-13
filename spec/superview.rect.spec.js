@@ -26,7 +26,7 @@ describe('getting/setting the size of an element', function () {
     
     expect(v.onResized().emit).toHaveBeenCalled();
     expect(view).toBe(v);
-    expect(size.equals(s)).toBeTruthy();
+    expect(Superview.Rect.areEqual(size, s)).toBeTruthy();
   });
   
   it('should not emit an onResized event if the size set is the same as the current size', function () {
@@ -52,8 +52,8 @@ describe('getting/setting the outer size of the element', function () {
     var s = {width: 123, height: 456};
     v.setOuterSize(s);
     
-    expect(v.getRect().width()).toEqual(83);
-    expect(v.getRect().height()).toEqual(416);
+    expect(v.getRect().width).toEqual(83);
+    expect(v.getRect().height).toEqual(416);
   });
   
   it('should retrieve the size inclusive of border and padding', function () {
@@ -75,8 +75,8 @@ describe('getting/setting the inner position of an element', function () {
   it('should pass on the position to the dom element', function () {
     var v = new Superview();
     v.moveTo({top: 123, left: 456});
-    expect(v.getRect().top()).toEqual(123);
-    expect(v.getRect().left()).toEqual(456);
+    expect(v.getRect().top).toEqual(123);
+    expect(v.getRect().left).toEqual(456);
   });
   
   it('should emit an onMoved event with the view,rect,outerRect', function () {
@@ -97,7 +97,7 @@ describe('getting/setting the inner position of an element', function () {
     
     expect(v.onMoved().emit).toHaveBeenCalled();
     expect(view).toBe(v);
-    expect(pos.equals(p)).toBeTruthy();
+    expect(Superview.Rect.areEqual(pos, p)).toBeTruthy();
     expect(outerPos).not.toBeNull();
   });
   
@@ -123,11 +123,11 @@ describe('moving the outer positon of an element (moveOuterTo())', function () {
     
     var rect = v.getRect(), outer = v.getOuterRect();
     
-    expect(rect.top()).toEqual(143);
-    expect(outer.top()).toEqual(123);
+    expect(rect.top).toEqual(143);
+    expect(outer.top).toEqual(123);
     
-    expect(rect.left()).toEqual(476);
-    expect(outer.left()).toEqual(456);
+    expect(rect.left).toEqual(476);
+    expect(outer.left).toEqual(456);
   });
   
   it('should pass on the call to moveTo', function () {
@@ -145,12 +145,12 @@ describe('getRect()', function () {
     v.moveTo({top: 45, left: 101});
     var r = v.getRect();
     
-    expect(r.width()).toEqual(123);
-    expect(r.height()).toEqual(456);
-    expect(r.top()).toEqual(45);
-    expect(r.left()).toEqual(101);
-    expect(r.right()).toEqual(101+123);
-    expect(r.bottom()).toEqual(45+456);
+    expect(r.width).toEqual(123);
+    expect(r.height).toEqual(456);
+    expect(r.top).toEqual(45);
+    expect(r.left).toEqual(101);
+    expect(r.right).toEqual(101+123);
+    expect(r.bottom).toEqual(45+456);
   });
 });
 
@@ -161,22 +161,22 @@ describe('getOuterRect()', function () {
     v.moveOuterTo({top: 45, left: 101});
     var r = v.getOuterRect();
     
-    expect(r.width()).toEqual(123);
-    expect(r.height()).toEqual(456);
-    expect(r.top()).toEqual(45);
-    expect(r.left()).toEqual(101);
-    expect(r.right()).toEqual(101+123);
-    expect(r.bottom()).toEqual(45+456);
+    expect(r.width).toEqual(123);
+    expect(r.height).toEqual(456);
+    expect(r.top).toEqual(45);
+    expect(r.left).toEqual(101);
+    expect(r.right).toEqual(101+123);
+    expect(r.bottom).toEqual(45+456);
   });
 });
 
-describe('paddingMetrics', function () {
+describe('paddingMetrics()', function () {
   
   var v;
   
   beforeEach(function () {
     v = new Superview();
-    v.css({
+    v.z().css({
       paddingTop: 1,
       paddingBottom: 2,
       paddingLeft: 3,
@@ -185,31 +185,31 @@ describe('paddingMetrics', function () {
   });
   
   it('top should return top', function () {
-    expect(v.paddingMetrics().top()).toEqual(1);
+    expect(v.paddingMetrics().top).toEqual(1);
   });
   it('left should return left', function () {
-    expect(v.paddingMetrics().left()).toEqual(3);
+    expect(v.paddingMetrics().left).toEqual(3);
   });
   it('bottom should return bottom', function () {
-    expect(v.paddingMetrics().bottom()).toEqual(2);
+    expect(v.paddingMetrics().bottom).toEqual(2);
   });
   it('right should return right', function () {
-    expect(v.paddingMetrics().right()).toEqual(4);
+    expect(v.paddingMetrics().right).toEqual(4);
   });
   it('width should return left+right', function () {
-    expect(v.paddingMetrics().width()).toEqual(7);
+    expect(v.paddingMetrics().width).toEqual(7);
   });
   it('height should return top+bottom', function () {
-    expect(v.paddingMetrics().height()).toEqual(3);
+    expect(v.paddingMetrics().height).toEqual(3);
   });
 })
 
-describe('borderMetrics', function () {
+describe('borderMetrics()', function () {
   var v;
   
   beforeEach(function () {
     v = new Superview();
-    v.css({
+    v.z().css({
       borderTop: 1,
       borderBottom: 2,
       borderLeft: 3,
@@ -218,22 +218,22 @@ describe('borderMetrics', function () {
   });
   
   it('top should return top', function () {
-    expect(v.borderMetrics().top()).toEqual(1);
+    expect(v.borderMetrics().top).toEqual(1);
   });
   it('left should return left', function () {
-    expect(v.borderMetrics().left()).toEqual(3);
+    expect(v.borderMetrics().left).toEqual(3);
   });
   it('bottom should return bottom', function () {
-    expect(v.borderMetrics().bottom()).toEqual(2);
+    expect(v.borderMetrics().bottom).toEqual(2);
   });
   it('right should return right', function () {
-    expect(v.borderMetrics().right()).toEqual(4);
+    expect(v.borderMetrics().right).toEqual(4);
   });
   it('width should return left+right', function () {
-    expect(v.borderMetrics().width()).toEqual(7);
+    expect(v.borderMetrics().width).toEqual(7);
   });
   it('height should return top+bottom', function () {
-    expect(v.borderMetrics().height()).toEqual(3);
+    expect(v.borderMetrics().height).toEqual(3);
   });
 })
 

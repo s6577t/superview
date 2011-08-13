@@ -46,17 +46,6 @@
     z: function () { 
       return this._zElem; 
     },
-    css: function () {
-      if (arguments.length === 0) {
-        return this;
-      }
-      if (arguments.length === 1) {
-        return this._zElem.css.apply(this._zElem, arguments);
-      }
-      
-      this._zElem.css.apply(this._zElem, arguments);
-      return this;
-    },
     /*
       View tree members
     */
@@ -142,26 +131,33 @@
     borderMetrics: function () {
       var self = this;
       var z = this.z();
-      return {
-        top:    function () { return parseFloat(z.css('borderTopWidth')) || 0 },
-        right:  function () { return parseFloat(z.css('borderRightWidth')) || 0 },
-        bottom: function () { return parseFloat(z.css('borderBottomWidth')) || 0 },
-        left:   function () { return parseFloat(z.css('borderLeftWidth')) || 0 },
-        width:  function () { return this.right() + this.left() },
-        height: function () { return this.top() + this.bottom() }
-      };
+      var m = {
+        top:    parseFloat(z.css('borderTopWidth')) || 0 ,
+        right:  parseFloat(z.css('borderRightWidth')) || 0,
+        bottom: parseFloat(z.css('borderBottomWidth')) || 0,
+        left:   parseFloat(z.css('borderLeftWidth')) || 0
+      }
+      
+      m.width = m.right + m.left;
+      m.height = m.top + m.bottom;
+      
+      return m;
     },
     paddingMetrics: function () {
       var self = this;
       var z = this.z();
-      return {
-        top:    function () { return parseFloat(z.css('paddingTop')) || 0 },
-        right:  function () { return parseFloat(z.css('paddingRight')) || 0 },
-        bottom: function () { return parseFloat(z.css('paddingBottom')) || 0 },
-        left:   function () { return parseFloat(z.css('paddingLeft')) || 0 },
-        width:  function () { return this.right() + this.left() },
-        height: function () { return this.top() + this.bottom() }
-      };
+      
+      var m = {
+        top:    parseFloat(z.css('paddingTop')) || 0 ,
+        right:  parseFloat(z.css('paddingRight')) || 0,
+        bottom: parseFloat(z.css('paddingBottom')) || 0,
+        left:   parseFloat(z.css('paddingLeft')) || 0
+      }
+      
+      m.width = m.right + m.left;
+      m.height = m.top + m.bottom;
+      
+      return m;
     },
     
     setSize: function (s) {
@@ -169,16 +165,16 @@
       var z = this.z();
       var r = this.getRect();
       
-      if (typeof s.width === 'number' && s.width != r.width()) {
+      if (Superview.Rect.hasWidth(s) && s.width != r.width) {
         resized = true;
-        r.width(s.width);
-        z.css('width', r.width());
+        r.width = s.width;
+        z.css('width', r.width);
       }
       
-      if (typeof s.height === 'number' && s.height != r.height()) {
+      if (Superview.Rect.hasHeight(s) && s.height != r.height) {
         resized = true;
-        r.height(s.height);
-        z.css('height', r.height());
+        r.height = s.height;
+        z.css('height', r.height);
       }
       
       if (resized) {
@@ -190,12 +186,12 @@
     setOuterSize: function (s) {
       var z = this.z();
       
-      if (typeof s.width === 'number') {
-        s.width = s.width - (this.paddingMetrics().width() + this.borderMetrics().width());
+      if (Superview.Rect.hasWidth(s)) {
+        s.width = s.width - (this.paddingMetrics().width + this.borderMetrics().width);
       }
       
-      if (typeof s.height === 'number') {
-        s.height = s.height - (this.paddingMetrics().height() + this.borderMetrics().height());
+      if (Superview.Rect.hasHeight(s)) {
+        s.height = s.height - (this.paddingMetrics().height + this.borderMetrics().height);
       }
       
       return this.setSize(s);
@@ -206,16 +202,16 @@
       var z = this.z();
       var r = this.getRect();
       
-      if (typeof p.top === 'number' && p.top != r.top()) {
+      if (typeof p.top === 'number' && p.top != r.top) {
         moved = true;
-        r.top(p.top + this.paddingMetrics().top() + this.borderMetrics().top());
-        z.css('top', r.top());
+        r.top = p.top + this.paddingMetrics().top + this.borderMetrics().top;
+        z.css('top', r.top);
       }
       
-      if (typeof p.left === 'number' && p.left != r.left()) {
+      if (typeof p.left === 'number' && p.left != r.left) {
         moved = true;
-        r.left(p.left + this.paddingMetrics().left() + this.borderMetrics().left());
-        z.css('left', r.left());
+        r.left = p.left + this.paddingMetrics().left + this.borderMetrics().left;
+        z.css('left', r.left);
       }
       
       if (moved) {
@@ -228,11 +224,11 @@
       var z = this.z();
       
       if (typeof p.top === 'number') {
-        p.top = p.top - (this.paddingMetrics().top() + this.borderMetrics().top());
+        p.top = p.top - (this.paddingMetrics().top + this.borderMetrics().top);
       }
       
       if (typeof p.left === 'number') {
-        p.left = p.left - (this.paddingMetrics().left() + this.borderMetrics().left());
+        p.left = p.left - (this.paddingMetrics().left + this.borderMetrics().left);
       }
       
       return this.moveTo(p);
@@ -245,12 +241,17 @@
         top: parseFloat(z.css('top'))
       };
  
-      return new Superview.Rect({
-        top: p.top + this.paddingMetrics().top() + this.borderMetrics().top(),
-        left: p.left + this.paddingMetrics().left() + this.borderMetrics().left(),
+      var r = {
+        top: p.top + this.paddingMetrics().top + this.borderMetrics().top,
+        left: p.left + this.paddingMetrics().left + this.borderMetrics().left,
         width: z.width(),
         height: z.height() 
-      });
+      };
+      
+      r.right = r.left + r.width;
+      r.bottom = r.top + r.height;
+      
+      return r;
     },
     getOuterRect: function () {
       var z = this.z();
@@ -259,12 +260,17 @@
         top: parseFloat(z.css('top'))
       };
       
-      return new Superview.Rect({
+      var r = {
         top: p.top ,
         left: p.left,
         width: z.outerWidth(),
         height: z.outerHeight() 
-      });
+      };
+      
+      r.right = r.left + r.width;
+      r.bottom = r.top + r.height;
+      
+      return r;
     }
   }
   
