@@ -3,7 +3,7 @@
 describe('getting/setting the size of an element', function () {
   it('should pass on the dimensions to the dom element', function () {
     var v = new Superview();
-    v.setSize({width: 123, height: 456});
+    v.resize({width: 123, height: 456});
     expect(v.z().width()).toEqual(123);
     expect(v.z().height()).toEqual(456);
   });
@@ -22,7 +22,7 @@ describe('getting/setting the size of an element', function () {
     });
     
     var s = {width: 123, height: 456};
-    v.setSize(s);
+    v.resize(s);
     
     expect(v.onResized().emit).toHaveBeenCalled();
     expect(view).toBe(v);
@@ -31,10 +31,10 @@ describe('getting/setting the size of an element', function () {
   
   it('should not emit an onResized event if the size set is the same as the current size', function () {
     var v = new Superview();
-    v.setSize({width: 123, height: 456});
+    v.resize({width: 123, height: 456});
     
     spyOn(v.onResized(), 'emit');
-    v.setSize({width: 123, height: 456});
+    v.resize({width: 123, height: 456});
     
     expect(v.onResized().emit).not.toHaveBeenCalled();
   });
@@ -50,24 +50,24 @@ describe('getting/setting the outer size of the element', function () {
     });
     
     var s = {width: 123, height: 456};
-    v.setOuterSize(s);
+    v.outerResize(s);
     
-    expect(v.getRect().width).toEqual(83);
-    expect(v.getRect().height).toEqual(416);
+    expect(v.rect().width).toEqual(83);
+    expect(v.rect().height).toEqual(416);
   });
   
   it('should retrieve the size inclusive of border and padding', function () {
     var v = new Superview();
-    v.setOuterSize({width: 123, height: 456});
+    v.outerResize({width: 123, height: 456});
     expect(v.z().outerWidth()).toEqual(123);
     expect(v.z().outerHeight()).toEqual(456);
   });
   
-  it('should pass on the call to setSize', function () {
+  it('should pass on the call to resize', function () {
     var v = new Superview();
-    spyOn(v, 'setSize');
-    v.setOuterSize({width: 123, height: 456});
-    expect(v.setSize).toHaveBeenCalled();
+    spyOn(v, 'resize');
+    v.outerResize({width: 123, height: 456});
+    expect(v.resize).toHaveBeenCalled();
   });
 });
 
@@ -75,8 +75,8 @@ describe('moving the inner position of an element', function () {
   it('should pass on the position to the dom element', function () {
     var v = new Superview();
     v.moveTo({top: 123, left: 456});
-    expect(v.getRect().top).toEqual(123);
-    expect(v.getRect().left).toEqual(456);
+    expect(v.rect().top).toEqual(123);
+    expect(v.rect().left).toEqual(456);
   });
   
   it('should emit an onMoved event with the view,rect,outerRect', function () {
@@ -119,11 +119,11 @@ describe('moving the inner position of an element', function () {
       padding: 15
     });
     
-    v.setSize({width: 50, height: 60});
+    v.resize({width: 50, height: 60});
     v.moveTo({top: 200, left: 300});
     
-    var rect = v.getRect(),
-        outer = v.getOuterRect();
+    var rect = v.rect(),
+        outer = v.outerRect();
     
     expect(rect.left).toEqual(300);
     expect(rect.top).toEqual(200);  
@@ -144,11 +144,11 @@ describe('moving the inner position of an element', function () {
       padding: 15
     });
     
-    v.setSize({width: 50, height: 60});
+    v.resize({width: 50, height: 60});
     v.moveTo({right: 200, bottom: 300});
     
-    var rect = v.getRect(),
-        outer = v.getOuterRect();
+    var rect = v.rect(),
+        outer = v.outerRect();
     
     expect(rect.left).toEqual(200 - 50);
     expect(rect.top).toEqual(300 - 60);  
@@ -162,7 +162,7 @@ describe('moving the inner position of an element', function () {
   });
 });
 
-describe('moving the outer positon of an element (moveOuterTo())', function () {
+describe('moving the outer positon of an element (outerMoveTo())', function () {
   it('should move the element relative to the view area incl border and padding', function () {
     var v = new Superview();
     
@@ -171,11 +171,11 @@ describe('moving the outer positon of an element (moveOuterTo())', function () {
       padding: 17
     });
     
-    v.moveOuterTo({top: 150, left: 200});
-    v.setOuterSize({width: 400, height: 300});
+    v.outerMoveTo({top: 150, left: 200});
+    v.outerResize({width: 400, height: 300});
     
-    var rect = v.getRect(), 
-        outer = v.getOuterRect();
+    var rect = v.rect(), 
+        outer = v.outerRect();
     
     expect(rect.top).toEqual(150 + 20);
     expect(rect.left).toEqual(200 + 20);
@@ -196,11 +196,11 @@ describe('moving the outer positon of an element (moveOuterTo())', function () {
       padding: 17
     });
     
-    v.setOuterSize({width: 350, height: 300});
-    v.moveOuterTo({bottom: 650, right: 800});
+    v.outerResize({width: 350, height: 300});
+    v.outerMoveTo({bottom: 650, right: 800});
     
-    var rect = v.getRect(), 
-        outer = v.getOuterRect();
+    var rect = v.rect(), 
+        outer = v.outerRect();
     
     expect(rect.top).toEqual(370);
     expect(rect.left).toEqual(470);
@@ -216,15 +216,15 @@ describe('moving the outer positon of an element (moveOuterTo())', function () {
   it('should pass on the call to moveTo', function () {
     var v = new Superview();
     spyOn(v, 'moveTo');
-    v.moveOuterTo({left: 123, top: 456});
+    v.outerMoveTo({left: 123, top: 456});
     expect(v.moveTo).toHaveBeenCalled();
   });
 });
 
-describe('getRect()', function () {
+describe('rect()', function () {
   it('should be all zero on a new view', function () {
     var v = new Superview();
-    var r = v.getRect()
+    var r = v.rect()
     "top,left,bottom,right,width,height".split(",").forEach(function(m) {
       expect(r[m]).toEqual(0);
     })
@@ -238,10 +238,10 @@ describe('getRect()', function () {
       padding: 5
     });
     
-    v.setSize({width: 123, height: 456});
+    v.resize({width: 123, height: 456});
     v.moveTo({top: 45, left: 101});
     
-    var r = v.getRect();
+    var r = v.rect();
     
     expect(r.width).toEqual(123);
     expect(r.height).toEqual(456);
@@ -252,7 +252,7 @@ describe('getRect()', function () {
   });
 });
 
-describe('getOuterRect()', function () {
+describe('outerRect()', function () {
   it('should returns the width, height top and left of the element including border and padding', function () {
     var v = new Superview();
     
@@ -261,9 +261,9 @@ describe('getOuterRect()', function () {
       padding: 5
     }); 
        
-    v.setSize({width: 123, height: 456});
+    v.resize({width: 123, height: 456});
     v.moveTo({top: 45, left: 101});
-    var r = v.getOuterRect();
+    var r = v.outerRect();
     
     expect(r.top).toEqual(45 - 20);
     expect(r.left).toEqual(101 - 20);
@@ -347,13 +347,13 @@ describe('borderMetrics()', function () {
   - emits and event with (sourceView, position) // position is left,top
   - css position should be absolute
 
-- .setSize({width: w, height: h})
+- .resize({width: w, height: h})
   - sets the css width and height of the container element
   - emits a resized event with (sourceView, dimensions)
-  .setOuterSize({width:w, height:h})
+  .outerResize({width:w, height:h})
   - set the size including the padding and border
   
-- .getRect()
+- .rect()
   - gets the left, top, width and height of the element
 
 

@@ -14,6 +14,7 @@
       hasViewMixin: true,
       _controller: null,
       _parentView: null,
+      _binding: null,
       _subviews: {},
       _uid: Superview.uidSpool++,
       _zElem: z.div().css({
@@ -160,10 +161,10 @@
       return m;
     },
     
-    setSize: function (s) {
+    resize: function (s) {
       var resized = false;
       var z = this.z();
-      var r = this.getRect();
+      var r = this.rect();
       
       if (Superview.Rect.hasWidth(s) && s.width != r.width) {
         resized = true;
@@ -178,12 +179,12 @@
       }
       
       if (resized) {
-        this.onResized().emit(this, this.getRect(), this.getOuterRect());
+        this.onResized().emit(this, this.rect(), this.outerRect());
       }
       
       return this;
     },
-    setOuterSize: function (s) {
+    outerResize: function (s) {
       var z = this.z();
       
       if (Superview.Rect.hasWidth(s)) {
@@ -194,13 +195,13 @@
         s.height = s.height - (this.paddingMetrics().height + this.borderMetrics().height);
       }
       
-      return this.setSize(s);
+      return this.resize(s);
     },
     
     moveTo: function (p) {
       var moved = false;
       var z = this.z();
-      var r = this.getRect();
+      var r = this.rect();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
       
@@ -225,12 +226,12 @@
       }
       
       if (moved) {
-        this.onMoved().emit(this, this.getRect(), this.getOuterRect());
+        this.onMoved().emit(this, this.rect(), this.outerRect());
       }
       
       return this;
     },
-    moveOuterTo: function (p) {
+    outerMoveTo: function (p) {
       var z = this.z();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
@@ -256,7 +257,7 @@
       return this.moveTo(p);
     },
     
-    getRect: function () {
+    rect: function () {
       var self = this;
       var z = this.z();
       var p = {
@@ -276,7 +277,7 @@
       
       return r;
     },
-    getOuterRect: function () {
+    outerRect: function () {
       var self = this;
       var z = this.z();
       var p = {
@@ -296,14 +297,16 @@
       
       return r;
     },
+    
     bindTo: function (otherView, binding) {
       var self = this;
       
-      self._binding = extend({view: otherView}).with(binding);
+      self._binding = binding;
+      binding.otherView = otherView;
       
       self._bindingResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
         var binding = self._binding;
-        var outerRect = self.getOuterRect();
+        var outerRect = self.outerRect();
         
         function handleSize (dimension) {
           switch (typeof binding[dimension]) {
@@ -328,7 +331,7 @@
         handleSize('width');
         handleSize('height');
         
-        self.setOuterSize(outerRect);
+        self.outerResize(outerRect);
       }
       
       self._bindingMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
@@ -374,7 +377,7 @@
         handlePosition('right', 'width', 'left', -1);
         //handlePosition('left', 'width', 'right');
         
-        self.moveOuterTo(newOuterRect);
+        self.outerMoveTo(newOuterRect);
       };
       
       otherView.onResized(self._bindingResizeHandler);
@@ -382,6 +385,9 @@
       otherView.onMoved(self._bindingResizeHandler);
       otherView.onMoved(self._bindingMoveHandler);
       return this;
+    },
+    binding: function () {
+      return this._binding;
     }
   }
   
