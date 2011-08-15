@@ -2,7 +2,7 @@
   
   Superview = function () {
       
-    Events(this).define( 
+    eventify(this).define( 
       'onResized', // (source_view, rect, outerRect)
       'onMoved', // (source_view, rect, outerRect)
       'onSubviewAdded', // (child, parent)

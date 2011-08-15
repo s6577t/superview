@@ -1,3 +1,45 @@
+Superview.Page = (function () {
+  
+  var Superview.Page = function () {
+    extend(this).mixin(Superview);
+  };
+  
+  Superview.Page.prototype = {
+    
+  };
+  
+  return Superview.Page;
+})();
+
+
+
+Superview.extend = function (extension) {
+  
+  var ctor = function () {
+    extend(this).with(extension);
+  }
+  
+  ctor.prototype = extension;
+  
+  return ctor;
+}
+
+;(function () {
+  
+  MyView = function () {
+    extend(this).mixin(Superview);
+    Events(this).define()
+  }
+  
+  return MyView;
+})();
+
+
+
+
+
+
+
 Page = function () {
   extend(this).mixin(View);
   
