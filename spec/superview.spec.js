@@ -1,12 +1,13 @@
 describe('superview', function () {
   
-  it("should assign unique uuids", function () {
+  it("should assign unique ids", function () {
     var v1 = new View1, v2 = new View1, v3 = new View1;
   
-    expect(v1.uuid()).not.toEqual(v2.uuid());    
-    expect(v1.uuid()).not.toEqual(v3.uuid());    
-    expect(v2.uuid()).not.toEqual(v3.uuid());    
+    expect(v1.uid()).not.toEqual(v2.uid());    
+    expect(v1.uid()).not.toEqual(v3.uid());    
+    expect(v2.uid()).not.toEqual(v3.uid());    
   })  
+  
   
   it("should have a hasViewMixin flag", function () {
     var v1 = new View1

@@ -13,6 +13,12 @@
     hasLeft: function (r) {
       return r && (typeof r.left === 'number');
     },
+    hasBottom: function (r) {
+      return r && (typeof r.bottom === 'number');
+    },
+    hasRight: function (r) {
+      return r && (typeof r.right === 'number');
+    },
     samePosition: function () {
       var args = arguments;
       var f = args[0];

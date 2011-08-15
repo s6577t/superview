@@ -249,7 +249,7 @@ describe("view tree related behaviour", function () {
     
     it('should not be included in the parents subviews()', function () {
       child.remove();
-      expect(parent._subviews[child.uuid()]).toBeUndefined();
+      expect(parent._subviews[child.uid()]).toBeUndefined();
     });
     
     it('should emit onRemoved with child,null if it is the root', function () {

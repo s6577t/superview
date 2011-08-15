@@ -15,13 +15,13 @@
       _controller: null,
       _parentView: null,
       _subviews: {},
-      _uuid: uuid(),
+      _uid: Superview.uidSpool++,
       _zElem: z.div().css({
         overflow: 'hidden',
         display: 'inline-block',
         position: 'absolute',
         left: 0,
-        right: 0
+        top: 0
       })
     });    
   }
@@ -34,8 +34,8 @@
     getController: function () {
       return this._controller;
     },
-    uuid: function() { 
-      return this._uuid; 
+    uid: function() { 
+      return this._uid; 
     },
     /*
       DOM related members
@@ -52,7 +52,7 @@
     addSubview: function (view) {
      this.z().append(view.elem());
      view.setParentView(this);
-     this._subviews[view.uuid()] = view;
+     this._subviews[view.uid()] = view;
      
      // emit an event for listeners
      this.onSubviewAdded().emit(view, this);
@@ -82,7 +82,7 @@
     setParentView: function (parentView) {
       if (!parentView) return this.remove();
       if (this._parentView) throw 'parent view already set';
-      parentView._subviews[this.uuid()] = this;
+      parentView._subviews[this.uid()] = this;
       this._parentView = parentView;
       this.onParentViewSet().emit(this, parentView);
       return this;
@@ -114,7 +114,7 @@
       this.onRemoved().emit(this, parentView || null);
       
       if (parentView) {
-        delete parentView._subviews[this.uuid()];
+        delete parentView._subviews[this.uid()];
         parentView.onSubviewRemoved().emit(this, parentView);
       }
       
@@ -178,7 +178,7 @@
       }
       
       if (resized) {
-        this.onResized().emit(this, r, this.getOuterRect());
+        this.onResized().emit(this, this.getRect(), this.getOuterRect());
       }
       
       return this;
@@ -201,49 +201,72 @@
       var moved = false;
       var z = this.z();
       var r = this.getRect();
+      var paddingMetrics = this.paddingMetrics();
+      var borderMetrics = this.borderMetrics();
       
-      if (typeof p.top === 'number' && p.top != r.top) {
+      if (!Superview.Rect.hasTop(p) && Superview.Rect.hasBottom(p)) {
+        p.top = p.bottom - r.height;
+      }
+      
+      if (!Superview.Rect.hasLeft(p) && Superview.Rect.hasRight(p)) {
+        p.left = p.right - r.width;
+      }
+      
+      if (Superview.Rect.hasTop(p) && p.top != r.top) {
         moved = true;
-        r.top = p.top + this.paddingMetrics().top + this.borderMetrics().top;
+        r.top = p.top - paddingMetrics.top - borderMetrics.top;
         z.css('top', r.top);
       }
       
       if (typeof p.left === 'number' && p.left != r.left) {
         moved = true;
-        r.left = p.left + this.paddingMetrics().left + this.borderMetrics().left;
+        r.left = p.left - paddingMetrics.left - borderMetrics.left;
         z.css('left', r.left);
       }
       
       if (moved) {
-        this.onMoved().emit(this, r, this.getOuterRect());
+        this.onMoved().emit(this, this.getRect(), this.getOuterRect());
       }
       
       return this;
     },
     moveOuterTo: function (p) {
       var z = this.z();
+      var paddingMetrics = this.paddingMetrics();
+      var borderMetrics = this.borderMetrics();
       
-      if (typeof p.top === 'number') {
-        p.top = p.top - (this.paddingMetrics().top + this.borderMetrics().top);
+      // translate this call into a repositioning of the inner rectangle
+      
+      if (Superview.Rect.hasTop(p)) {
+        p.top += paddingMetrics.top + borderMetrics.top;
+      } 
+      
+      if (Superview.Rect.hasBottom(p)) {
+        p.bottom -= paddingMetrics.bottom + borderMetrics.bottom
       }
       
-      if (typeof p.left === 'number') {
-        p.left = p.left - (this.paddingMetrics().left + this.borderMetrics().left);
+      if (Superview.Rect.hasLeft(p)) {
+        p.left += paddingMetrics.left + borderMetrics.left
+      }
+      
+      if (Superview.Rect.hasRight(p)) {
+        p.right -= paddingMetrics.right + borderMetrics.right;
       }
       
       return this.moveTo(p);
     },
     
     getRect: function () {
+      var self = this;
       var z = this.z();
       var p = {
         left: parseFloat(z.css('left')),
         top: parseFloat(z.css('top'))
       };
- 
+  
       var r = {
-        top: p.top + this.paddingMetrics().top + this.borderMetrics().top,
-        left: p.left + this.paddingMetrics().left + this.borderMetrics().left,
+        top: p.top + self.paddingMetrics().top + self.borderMetrics().top,
+        left: p.left + self.paddingMetrics().left + self.borderMetrics().left,
         width: z.width(),
         height: z.height() 
       };
@@ -254,6 +277,7 @@
       return r;
     },
     getOuterRect: function () {
+      var self = this;
       var z = this.z();
       var p = {
         left: parseFloat(z.css('left')),
@@ -271,7 +295,96 @@
       r.bottom = r.top + r.height;
       
       return r;
+    },
+    bindTo: function (otherView, binding) {
+      var self = this;
+      
+      self._binding = extend({view: otherView}).with(binding);
+      
+      self._bindingResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var binding = self._binding;
+        var outerRect = self.getOuterRect();
+        
+        function handleSize (dimension) {
+          switch (typeof binding[dimension]) {
+            case 'undefined':
+              break;
+            case 'boolean':
+              if (binding[dimension]) {
+                outerRect[dimension] = otherViewRect[dimension];
+              }
+              break;
+            case 'number':
+              outerRect[dimension] = otherViewRect[dimension] * binding[dimension];
+              break;
+            case 'function':
+              outerRect[dimension] = binding[dimension](otherView, otherViewRect, otherViewOuterRect);
+              break;
+            default:
+              throw new Error("Invalid binding for "+dimension+": " + binding[dimension]);
+          }
+        }
+        
+        handleSize('width');
+        handleSize('height');
+        
+        self.setOuterSize(outerRect);
+      }
+      
+      self._bindingMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var binding = self._binding;
+        var newOuterRect = {};
+        
+        function handlePosition (position, dimension, opposite) {
+          switch (typeof binding[position]) {
+            case 'undefined':
+              break;
+            case 'boolean':
+              if (binding[position]) {
+                newOuterRect[position] = otherViewOuterRect[position];
+              }
+              break;
+            case 'number':
+              newOuterRect[position] = otherViewRect[dimension] * binding[position];
+              break;
+            case 'string':
+              var stringHandled = true;
+              switch (binding[position]) {
+                case position:
+                  newOuterRect[position] = otherViewOuterRect[position];
+                  break;
+                case opposite:
+                  newOuterRect[position] = otherViewOuterRect[opposite];
+                  break;
+                default:
+                  stringHandled = false;
+              }
+              if (stringHandled) break;
+            case 'function':
+              newOuterRect[position] = binding[position](otherView, otherViewRect, otherViewOuterRect);
+              break;
+            default:
+              throw new Error("Invalid binding for " + position + ": " + binding[position]);
+          }
+        }
+        
+        handlePosition('top', 'height', 'bottom', 1);
+        handlePosition('bottom', 'height','top', -1);
+        handlePosition('left', 'width', 'right', 1);
+        handlePosition('right', 'width', 'left', -1);
+        //handlePosition('left', 'width', 'right');
+        
+        self.moveOuterTo(newOuterRect);
+      };
+      
+      otherView.onResized(self._bindingResizeHandler);
+      otherView.onResized(self._bindingMoveHandler);
+      otherView.onMoved(self._bindingResizeHandler);
+      otherView.onMoved(self._bindingMoveHandler);
+      return this;
     }
   }
+  
+  Superview.uidSpool = 1;
   
 })(jQuery)
