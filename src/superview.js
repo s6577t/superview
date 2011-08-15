@@ -1,4 +1,5 @@
 (function ($) {
+  
   Superview = function () {
       
     Events(this).define( 
@@ -298,8 +299,11 @@
       return r;
     },
     
+    
     bindTo: function (otherView, binding) {
       var self = this;
+      
+      if (self.binding()) self.unbind();
       
       self._binding = binding;
       binding.otherView = otherView;
@@ -371,11 +375,10 @@
           }
         }
         
-        handlePosition('top', 'height', 'bottom', 1);
-        handlePosition('bottom', 'height','top', -1);
-        handlePosition('left', 'width', 'right', 1);
-        handlePosition('right', 'width', 'left', -1);
-        //handlePosition('left', 'width', 'right');
+        handlePosition('top', 'height', 'bottom');
+        handlePosition('bottom', 'height','top');
+        handlePosition('left', 'width', 'right');
+        handlePosition('right', 'width', 'left');
         
         self.outerMoveTo(newOuterRect);
       };
@@ -384,10 +387,27 @@
       otherView.onResized(self._bindingMoveHandler);
       otherView.onMoved(self._bindingResizeHandler);
       otherView.onMoved(self._bindingMoveHandler);
+      
       return this;
     },
     binding: function () {
       return this._binding;
+    },
+    unbind: function () {
+      
+      var self = this;
+      var binding = this.binding();
+      
+      if (binding) {
+        binding.otherView.onResized().unbind(self._bindingMoveHandler);
+        binding.otherView.onResized().unbind(self._bindingResizeHandler);
+        binding.otherView.onMoved().unbind(self._bindingMoveHandler);
+        binding.otherView.onMoved().unbind(self._bindingResizeHandler);
+        
+        this._binding = null;
+      }
+      
+      return this;
     }
   }
   

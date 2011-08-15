@@ -13,6 +13,13 @@ describe("bind layout behaviour", function () {
     it ('should be chainable', function () {
       var rtn = view.bindTo(otherView, {});
       expect(rtn).toBe(view);
+    });
+    
+    it ('should unbind any current binding before making a new binding', function() {
+      view.bindTo(otherView, {});
+      spyOn(view, 'unbind');
+      view.bindTo(new Superview(), {});
+      expect(view.unbind).toHaveBeenCalled();
     })
   
     describe("binding to the width of the other view", function () {
@@ -457,27 +464,33 @@ describe("bind layout behaviour", function () {
       expect(r).toBe(binding);
     })
   })
+
+  describe("unbind()", function () {
+    it('should be chainable', function () {
+      var v = new View1;
+      expect(v.unbind()).toBe(v);
+    })
+    it('should be inneffectual if there is no bound view', function () {
+      expect(view.unbind().binding()).toBeNull();
+    })
+    
+    it('should remove event listeners from the otherView', function () {
+
+      view.bindTo(otherView, {
+        left: function () { return 480; },
+        width: function () { return 313; }
+      });
+      
+      view.unbind();
+      
+      expect(otherView.onResized().listeners().length).toEqual(0);
+      expect(otherView.onMoved().listeners().length).toEqual(0);
+    })
+    
+    it('should result in subsequent calls to binding() returning null', function () {
+      view.bindTo(otherView, {});
+      view.unbind();
+      expect(view.binding()).toBeNull();
+    })
+  })
 });
-
-
-
-/*
-
-
-
-view.bindTo(other, {
-  width: true,
-  height: function (otherRect, view, other) { return otherRect.height * 0.5 ;} (function in context of view),
-  top: [true|top] | 'bottom' | '*3.2'(evalableexpress with) | function,
-  left: SIMILAR to TOP
-})
-
-- shuold not bindTo() more than once with calling unbind() first
-- calls unbind() if other emits onRemoved
-
-view.unbind()
-- if not bound returns ineffectual
-- stop listeneing to onMove and onResize events on the bindTo(other) view and sets this._bindTo and others to null
-
-
-*/
