@@ -10,7 +10,7 @@ Example:
 var obj = new Object();
 
 // install three events emitters on object
-Events(obj).define('onClick', 'onUpdate', 'onHide');
+eventify(obj).define('onClick', 'onUpdate', 'onHide');
 
 // register some listeners..
 obj.onClick(event_handler_function);
@@ -44,5 +44,5 @@ obj.onSomeEvent().emit("MEOW");
 => "MEOW"
 
 */
-function eventify(a){function b(a,b){var c=[],d=null,e={unbind:function(a){c=c.filter(function(b){return b!=a});return d},emit:function(){var a=(new Date).getTime(),f=parseInt(e.lastEmitTime)||0,g=parseInt(e.minimumEmitInterval)||0;e.eventArguments=arguments;var h=function(){e.lastEmitTime=a,c.forEach(function(a){typeof a=="function"?a.apply(d,e.eventArguments):typeof a=="object"&&typeof a[b]=="function"&&a[b].apply(d,e.eventArguments)})},i=function(){clearTimeout(e.intervalTimeoutId),e.intervalTimeoutId=null},j=function(){e.intervalTimeoutId||(e.intervalTimeoutId=setTimeout(function(){i(),h()},g))};f<a-g?(i(),h()):j();return d},throttle:function(a){a=typeof a=="number"?a:1,a=Math.max(a,1),e.minimumEmitInterval=a;return d},listeners:function(){return c}};a[b]=function(a){d=this;if(typeof a=="function"){c.push(a);return this}return e}}return{define:function(){Array.toArray(arguments).forEach(function(c){b(a,c)});return a}}}
+function deventify(a){for(var b in a)a[b]&&a[b].__eventifyEvent&&a[b]().unbindAll();return a}function eventify(a){function b(a,b){var c=[],d=null,e={unbind:function(a){c=c.filter(function(b){return b!=a});return d},unbindAll:function(a){c=[];return d},emit:function(){var a=(new Date).getTime(),f=parseInt(e.lastEmitTime)||0,g=parseInt(e.minimumEmitInterval)||0;e.eventArguments=arguments;var h=function(){e.lastEmitTime=a,c.forEach(function(a){typeof a=="function"?a.apply(d,e.eventArguments):typeof a=="object"&&typeof a[b]=="function"&&a[b].apply(d,e.eventArguments)})},i=function(){clearTimeout(e.intervalTimeoutId),e.intervalTimeoutId=null},j=function(){e.intervalTimeoutId||(e.intervalTimeoutId=setTimeout(function(){i(),h()},g))};f<a-g?(i(),h()):j();return d},throttle:function(a){a=typeof a=="number"?a:1,a=Math.max(a,1),e.minimumEmitInterval=a;return d},listeners:function(){return c}};a[b]=function(a){d=this;if(typeof a=="function"){c.push(a);return this}return e},a[b].__eventifyEvent=!0}return{define:function(){Array.toArray(arguments).forEach(function(c){b(a,c)});return a}}}
 ;

@@ -257,6 +257,19 @@ describe("view tree related behaviour", function () {
       parent.remove();
       expect(parent.onRemoved().emit).toHaveBeenCalledWith(parent, null);
     });
+    
+    it('should deventify itself', function () {
+      child.remove();
+      
+      ['onResized', 
+      'onMoved', 
+      'onSubviewAdded', 
+      'onSubviewRemoved',
+      'onParentViewSet', 
+      'onRemoved'].forEach(function (ev) {
+        expect(child[ev]().listeners().length).toEqual(0);
+      });
+    });
   });
 
 });

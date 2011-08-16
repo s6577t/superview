@@ -115,12 +115,15 @@
       this._parentView = null;
       this.onRemoved().emit(this, parentView || null);
       
+      
       if (parentView) {
         delete parentView._subviews[this.uid()];
         parentView.onSubviewRemoved().emit(this, parentView);
       }
       
       this.removeAllSubviews();
+      
+      deventify(this);
       return this;
     },
     removeAllSubviews: function () {
@@ -299,7 +302,6 @@
       return r;
     },
     
-    
     bindTo: function (otherView, binding) {
       var self = this;
       
@@ -387,8 +389,14 @@
       otherView.onResized(self._bindingMoveHandler);
       otherView.onMoved(self._bindingResizeHandler);
       otherView.onMoved(self._bindingMoveHandler);
+      otherView.onRemoved(function () {
+        self.unbind();
+      });
       
       return this;
+    },
+    bindToParent: function (binding) {
+      return this.bindTo(this.getParentView(), binding);
     },
     binding: function () {
       return this._binding;

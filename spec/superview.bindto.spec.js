@@ -421,7 +421,6 @@ describe("bind layout behaviour", function () {
         });
       })
     });
-
     describe("when repositioning the otherView", function () {
       it ("should effect the size bindings on the binding view", function () {
         view.bindTo(otherView, {
@@ -435,7 +434,6 @@ describe("bind layout behaviour", function () {
         expect(view.outerRect().width).toEqual(9876);
       })
     });
-  
     describe("when resizing the otherView", function () {
       it ("should effect the position bindings on the binding view", function () {
         view.bindTo(otherView, {
@@ -491,6 +489,30 @@ describe("bind layout behaviour", function () {
       view.bindTo(otherView, {});
       view.unbind();
       expect(view.binding()).toBeNull();
+    })
+  });
+  
+  describe('bindToParent()', function () {
+    it('should call bindTo with the parent of the view', function () {
+      view.setParentView(otherView);
+      spyOn(view, 'bindTo');
+      var binding = {};
+      view.bindToParent(binding);
+      expect(view.bindTo).toHaveBeenCalled();
+    });
+    it('should be chainable', function () {
+      view.setParentView(otherView);
+      
+      expect(view.bindToParent({})).toBe(view);
+    });
+  })
+
+  describe('when otherView is removed', function () {
+    it('should unbind from the view', function () {
+      spyOn(view, 'unbind');
+      view.bindTo(otherView, {});
+      otherView.remove();
+      expect(view.unbind).toHaveBeenCalled();
     })
   })
 });
