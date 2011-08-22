@@ -1,10 +1,11 @@
 Superview.Page = (function () {
   
-  var Superview.Page = function () {
+  var Page = function () {
     extend(this).mixin(Superview);
+    Superview.Window.install();
   };
   
-  Superview.Page.prototype = {
+  Page.prototype = {
     fitWindow: function () {
       this.bindTo(Superview.Window, {
         width: true,
@@ -13,6 +14,6 @@ Superview.Page = (function () {
     }
   };
   
-  return Superview.Page;
+  return Page;
 })();
 
