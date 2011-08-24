@@ -494,14 +494,14 @@ describe("bind layout behaviour", function () {
   
   describe('bindToParent()', function () {
     it('should call bindTo with the parent of the view', function () {
-      view.setParentView(otherView);
+      view.addTo(otherView);
       spyOn(view, 'bindTo');
       var binding = {};
       view.bindToParent(binding);
       expect(view.bindTo).toHaveBeenCalled();
     });
     it('should be chainable', function () {
-      view.setParentView(otherView);
+      view.addTo(otherView);
       
       expect(view.bindToParent({})).toBe(view);
     });

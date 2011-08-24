@@ -1,5 +1,4 @@
 describe('superview', function () {
-  
   it("should assign unique ids", function () {
     var v1 = new View1, v2 = new View1, v3 = new View1;
   

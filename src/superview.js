@@ -7,9 +7,12 @@
       'onMoved', // (source_view, rect, outerRect)
       'onSubviewAdded', // (child, parent)
       'onSubviewRemoved', // (child, parent)
-      'onParentViewSet', // (child, parent)
+      'onAdded', // (child, parent)
       'onRemoved' // (child, parent)
     );
+    
+    this.onResized().throttle(100);
+    this.onMoved().throttle(100);
     
     extend(this).with({
       hasViewMixin: true,
@@ -51,63 +54,60 @@
     /*
       View tree members
     */
-    addSubview: function (view) {
-     this.z().append(view.elem());
-     view.setParentView(this);
-     this._subviews[view.uid()] = view;
-     
-     // emit an event for listeners
-     this.onSubviewAdded().emit(view, this);
-     
-     return this;
-    },
-    addSubviews: function () {
+    add: function () {
       var subviewsToAdd = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
-      subviewsToAdd.forEach(function (subview) {
-        self.addSubview(subview);
+      subviewsToAdd.forEach(function (view) {
+        self.z().append(view.elem());
+        self._subviews[view.uid()] = view;
+        view._parentView = self;
+        // emit an event for listeners
+        self.onSubviewAdded().emit(view, self);
+        view.onAdded().emit(view, self);
       });
-      
       return this;
     },
-    isRootView: function () { 
-      return !this.getParentView(); 
+    // pass null to set as root view
+    addTo: function (parentView) {
+      if (!parentView || this._parentView) return this.remove();
+      parentView.add(this);
+      return this;
     },
-    getRootView: function () {
+    parentView: function () {
+      return this._parentView;
+    },
+    
+    isRootView: function () { 
+      return !this.parentView(); 
+    },
+    rootView: function () {
       var v = this;
       while (!v.isRootView()) {
-        v = v.getParentView();
+        v = v.parentView();
       }
       return v;
     },
-    // pass null to set as root view
-    setParentView: function (parentView) {
-      if (!parentView) return this.remove();
-      if (this._parentView) throw 'parent view already set';
-      parentView._subviews[this.uid()] = this;
-      this._parentView = parentView;
-      this.onParentViewSet().emit(this, parentView);
-      return this;
-    },
-    getParentView: function () {
-      return this._parentView;
-    },
-    // removeSubViews(list, of, subviews) OR removeSubViews(ONE_ARRAY)
-    removeSubviews: function () {
-      
-      var subviewsToRemove = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
-      var self = this;
-      subviewsToRemove.forEach(function (subview) {
-        self.removeSubview(subview);
-      });
-      
-      return this;
-    },
-    removeSubview: function (subview) {
-      subview.remove();
-      return this;
-    },
+    // () to remove from parent, an array and any number of arguments ro remove each of them
     remove: function () {
+      var self = this;
+      
+      var subviewsToRemove = null, arrayPassed = false;
+      if (arguments.length > 0) {
+        if (jQuery.isArray(arguments[0])) {
+          subviewsToRemove = arguments[0];
+          arrayPassed = true;
+        } else {
+          subviewsToRemove = Array.toArray(arguments);
+        }
+      }
+
+      if (arrayPassed || (subviewsToRemove && subviewsToRemove.length > 0)) {
+        subviewsToRemove.forEach(function (subview) {
+          subview.remove();
+        });
+        return self;
+      }
+      
       this.z().remove();
       
       var parentView = this._parentView;
@@ -121,13 +121,13 @@
         parentView.onSubviewRemoved().emit(this, parentView);
       }
       
-      this.removeAllSubviews();
+      this.removeAll();
       
       deventify(this);
       return this;
     },
-    removeAllSubviews: function () {
-      return this.removeSubviews(this.subviews());
+    removeAll: function () {
+      return this.remove(this.subviews());
     },
     subviews: function () {
       return Object.values(this._subviews);
@@ -396,7 +396,7 @@
       return this;
     },
     bindToParent: function (binding) {
-      return this.bindTo(this.getParentView(), binding);
+      return this.bindTo(this.parentView(), binding);
     },
     binding: function () {
       return this._binding;
