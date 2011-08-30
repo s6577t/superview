@@ -1,4 +1,4 @@
-Superview.Page = (function () {
+SvPage = (function () {
   
   var Page = function () {
     extend(this).mixin(Superview);
@@ -6,13 +6,11 @@ Superview.Page = (function () {
   
   Page.prototype = {
     initialize: function () {
-      Superview.Window.initialize();
-      return this;
-    },
-    render: function () {
       Superview.Window.install();
       this.z().addClass('page');
-      Superview.Window.add(this);
+      this.addTo(Superview.Window);
+      this.render();
+      this.parent().initialize();
       return this;
     },
     fitWindow: function () {

@@ -1,14 +1,14 @@
 describe('superview.page', function () {
   var pg;
   beforeEach(function () {
-    pg = new Superview.Page().render();
+    pg = new Superview.Page().initialize();
   })
   it('should have css class "page"', function () {
     expect(pg.z().hasClass('page')).toBe(true);
   });
   it('should be appended to the window', function () {
     spyOn(Superview.Window, 'add');
-    var pg = new Superview.Page().render();
+    var pg = new Superview.Page().initialize();
     expect(Superview.Window.add).toHaveBeenCalledWith(pg);
   })
   describe('fitting to the window', function () {

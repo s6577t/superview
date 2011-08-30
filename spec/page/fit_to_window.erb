@@ -1,0 +1,22 @@
+<script type="text/javascript" charset="utf-8">
+  
+  var MyPage = function () {
+    extend(this).mixin(Superview.Page);
+  }
+  
+  MyPage.prototype = {
+    render: function () {
+      this._box = new Superview().render().addTo(this);
+      this._box.resize({width: 300, height: 300});
+      return this
+    },
+    bind: function () {
+      return this.fitWindow();
+    }
+  }
+  
+  jQuery(function () {
+    var mpg = new MyPage().render();
+    mpg.initialize();
+  })
+</script>

@@ -24,7 +24,7 @@ var KeyCodes = {
     extend(this).with({
       hasViewMixin: true,
       _controller: null,
-      _parentView: null,
+      _parent: null,
       _binding: null,
       _subviews: {},
       _vid: Superview.vidSpool++,
@@ -67,7 +67,7 @@ var KeyCodes = {
       subviewsToAdd.forEach(function (view) {
         self.z().append(view.elem());
         self._subviews[view.vid()] = view;
-        view._parentView = self;
+        view._parent = self;
         // emit an event for listeners
         self.onSubviewAdded().emit(view, self);
         view.onAdded().emit(view, self);
@@ -75,22 +75,22 @@ var KeyCodes = {
       return this;
     },
     // pass null to set as root view
-    addTo: function (parentView) {
-      if (!parentView || this._parentView) return this.remove();
-      parentView.add(this);
+    addTo: function (parent) {
+      if (!parent || this._parent) return this.remove();
+      parent.add(this);
       return this;
     },
-    parentView: function () {
-      return this._parentView;
+    parent: function () {
+      return this._parent;
     },
     
     isRootView: function () { 
-      return !this.parentView(); 
+      return !this.parent(); 
     },
     rootView: function () {
       var v = this;
       while (!v.isRootView()) {
-        v = v.parentView();
+        v = v.parent();
       }
       return v;
     },
@@ -118,14 +118,14 @@ var KeyCodes = {
       
       this.z().remove();
       
-      var parentView = this._parentView;
+      var parent = this._parent;
       
-      this._parentView = null;
-      this.onRemoved().emit(this, parentView || null);
+      this._parent = null;
+      this.onRemoved().emit(this, parent || null);
       
-      if (parentView) {
-        delete parentView._subviews[this.vid()];
-        parentView.onSubviewRemoved().emit(this, parentView);
+      if (parent) {
+        delete parent._subviews[this.vid()];
+        parent.onSubviewRemoved().emit(this, parent);
       }
       
       this.removeAll();
@@ -410,7 +410,7 @@ var KeyCodes = {
       return this;
     },
     bindToParent: function (binding) {
-      return this.bindTo(this.parentView(), binding);
+      return this.bindTo(this.parent(), binding);
     },
     binding: function () {
       return this._binding;
@@ -457,6 +457,10 @@ var KeyCodes = {
     },
     repopulate: function () {
       return this.populate();
+    },
+    
+    draggable: function () {
+      
     }
   }
   
@@ -473,13 +477,11 @@ Superview.Page = (function () {
   
   Page.prototype = {
     initialize: function () {
-      Superview.Window.initialize();
-      return this;
-    },
-    render: function () {
       Superview.Window.install();
       this.z().addClass('page');
-      Superview.Window.add(this);
+      this.addTo(Superview.Window);
+      this.render();
+      this.parent().initialize();
       return this;
     },
     fitWindow: function () {

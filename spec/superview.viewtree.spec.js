@@ -33,13 +33,13 @@ describe("view tree related behaviour", function () {
       expect(v1.subviews().length).toEqual(1);      
     });
 
-    it('sets the parentView when adding a subview', function () {
+    it('sets the parent when adding a subview', function () {
       var parent = new View1,
       child = new View1
 
       parent.add(child)
 
-      expect(child.parentView()).toBe(parent)
+      expect(child.parent()).toBe(parent)
     })
 
     it('should emit an onSubviewAdded event with child,parent arguments', function () {
@@ -119,7 +119,7 @@ describe("view tree related behaviour", function () {
       
       child.addTo(parent);
       
-      expect(child._parentView).toBe(parent);
+      expect(child._parent).toBe(parent);
     });
 
     it('should be included in the parents subviews', function () {
@@ -187,7 +187,7 @@ describe("view tree related behaviour", function () {
     
     it('should not remove the view from its parent its called with an empty array', function () {
       child.remove([]);
-      expect(child.parentView()).toBe(parent);
+      expect(child.parent()).toBe(parent);
     })
     
     it('should not contain subviews removed with remove', function () {
@@ -224,7 +224,7 @@ describe("view tree related behaviour", function () {
     
     it('should set the subviews parent view to null', function () {
       parent.remove(child);
-      expect(child._parentView).toBeNull();
+      expect(child._parent).toBeNull();
     });
     
     it('should call remove on the subview', function () {
@@ -270,7 +270,7 @@ describe("view tree related behaviour", function () {
     
     it('should no longer have a parent view', function () {
       child.remove();
-      expect(child._parentView).toBeNull();
+      expect(child._parent).toBeNull();
     });
     
     it('should not be included in the parents subviews()', function () {

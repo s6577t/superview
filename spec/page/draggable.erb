@@ -1,6 +1,6 @@
 <script type="text/javascript" charset="utf-8">
   
-  var MyPage = function () {
+  var Draggable = function () {
     extend(this).mixin(Superview.Page);
   }
   
@@ -17,12 +17,7 @@
   }
   
   jQuery(function () {
-    window.mpg = new MyPage().render();
-    // console.info(page.outerRect());
-    Superview.Window.initialize();
-    // console.info(page.outerRect());
-    // Superview.Window.render();
-   // console.warn(Superview.Window.onResized().listeners().length);
-   // console.warn(Superview.Window.subviews())
+    var mpg = new MyPage().render();
+    mpg.initialize();
   })
 </script>
