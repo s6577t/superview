@@ -20,7 +20,7 @@
       _parentView: null,
       _binding: null,
       _subviews: {},
-      _uid: Superview.uidSpool++,
+      _vid: Superview.vidSpool++,
       _zElem: z.div().css({
         overflow: 'hidden',
         display: 'inline-block',
@@ -39,8 +39,8 @@
     getController: function () {
       return this._controller;
     },
-    uid: function() { 
-      return this._uid; 
+    vid: function() { 
+      return this._vid; 
     },
     /*
       DOM related members
@@ -59,7 +59,7 @@
       var self = this;
       subviewsToAdd.forEach(function (view) {
         self.z().append(view.elem());
-        self._subviews[view.uid()] = view;
+        self._subviews[view.vid()] = view;
         view._parentView = self;
         // emit an event for listeners
         self.onSubviewAdded().emit(view, self);
@@ -89,6 +89,7 @@
     },
     // () to remove from parent, an array and any number of arguments ro remove each of them
     remove: function () {
+      
       var self = this;
       
       var subviewsToRemove = null, arrayPassed = false;
@@ -115,9 +116,8 @@
       this._parentView = null;
       this.onRemoved().emit(this, parentView || null);
       
-      
       if (parentView) {
-        delete parentView._subviews[this.uid()];
+        delete parentView._subviews[this.vid()];
         parentView.onSubviewRemoved().emit(this, parentView);
       }
       
@@ -129,8 +129,16 @@
     removeAll: function () {
       return this.remove(this.subviews());
     },
-    subviews: function () {
-      return Object.values(this._subviews);
+    subviews: function (recur) {
+      var subs = Object.values(this._subviews);
+      
+      if (recur) {
+        subs.copy().forEach(function (s) {
+          subs = subs.concat(s.subviews(recur));
+        })
+      }
+      
+      return subs;
     },
     // rectangle related functionality
     borderMetrics: function () {
@@ -336,7 +344,6 @@
         
         handleSize('width');
         handleSize('height');
-        
         self.outerResize(outerRect);
       }
       
@@ -416,9 +423,36 @@
       }
       
       return this;
+    },
+    
+    initialize: function () {
+      var vs = this.subviews(true);
+      vs.unshift(this);
+      vs.forEach(function (view) {
+        view.bind()
+        view.populate()
+      });
+      this.onMoved().emit(this, this.rect(), this.outerRect());
+      this.onResized().emit(this, this.rect(), this.outerRect());
+      return this;
+    },
+    render: function () {
+      // NOOP default. override me!
+      return this
+    },
+    bind: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    populate: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    repopulate: function () {
+      return this.populate();
     }
   }
   
-  Superview.uidSpool = 1;
+  Superview.vidSpool = 1;
   
 })(jQuery)

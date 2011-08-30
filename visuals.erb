@@ -1,9 +1,28 @@
 <script type="text/javascript" charset="utf-8">
+  
+  var MyPage = function () {
+    extend(this).mixin(Superview.Page);
+  }
+  
+  MyPage.prototype = {
+    // render: {
+    //       
+    //       //this._box = new Superview()
+    //       //.resize({width: 300, height: 300})
+    //       //.addTo(this);
+    //     },
+    bind: function () {
+      return this.fitWindow();
+    }
+  }
+  
   jQuery(function () {
-    var page = new Superview.Page();
-    page.fitWindow();
-
-    var box = new Superview();
-    box.resize({width: 300, height: 300}).addTo(page);
+    window.mpg = new MyPage().render();
+    // console.info(page.outerRect());
+    Superview.Window.initialize();
+    // console.info(page.outerRect());
+    // Superview.Window.render();
+   // console.warn(Superview.Window.onResized().listeners().length);
+   // console.warn(Superview.Window.subviews())
   })
 </script>

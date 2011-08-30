@@ -158,6 +158,20 @@ describe("view tree related behaviour", function () {
       expect(parent.subviews()).not.toBe(parent._subviews);
       expect(parent.subviews()).not.toBe(parent.subviews());
     })
+  
+    describe ('with recursive as true', function () {
+      it('should return a subview array breadth-first order', function () {
+        
+        var p = new Superview, a = new Superview, b = new Superview, c = new Superview
+        p.add(a, b)
+        a.add(c)
+        
+        var svs = p.subviews(true)
+        expect(svs[0]).toBe(a);
+        expect(svs[1]).toBe(b);
+        expect(svs[2]).toBe(c);        
+      })
+    })
   })
 
   describe('removing subviews', function () {
@@ -261,7 +275,7 @@ describe("view tree related behaviour", function () {
     
     it('should not be included in the parents subviews()', function () {
       child.remove();
-      expect(parent._subviews[child.uid()]).toBeUndefined();
+      expect(parent._subviews[child.vid()]).toBeUndefined();
     });
     
     it('should emit onRemoved with child,null if it is the root', function () {

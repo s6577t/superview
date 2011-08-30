@@ -2,20 +2,28 @@ Superview.Page = (function () {
   
   var Page = function () {
     extend(this).mixin(Superview);
-    Superview.Window.install();
-    this.z().addClass('page');
-    Superview.Window.add(this);
   };
   
   Page.prototype = {
+    initialize: function () {
+      Superview.Window.initialize();
+      return this;
+    },
+    render: function () {
+      Superview.Window.install();
+      this.z().addClass('page');
+      Superview.Window.add(this);
+      return this;
+    },
     fitWindow: function () {
-      this.bindTo(Superview.Window, {
+      return this.bindTo(Superview.Window, {
         width: true,
         height: true
       });
-    }
+    },
   };
   
   return Page;
 })();
+
 

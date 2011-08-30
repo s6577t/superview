@@ -1,6 +1,6 @@
 Superview.Window = (function () {
   
-  var Window = new Superview();
+  var Window = new Superview().render();
 
   function fitToWindow () {
     var w = z.window(),
