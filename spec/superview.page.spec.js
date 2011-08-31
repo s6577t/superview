@@ -7,7 +7,7 @@ describe('superview.page', function () {
     expect(pg.z().hasClass('page')).toBe(true);
   });
   it('should be appended to the window', function () {
-    spyOn(Superview.Window, 'add');
+    spyOn(Superview.Window, 'add').andCallThrough();
     var pg = new Superview.Page().initialize();
     expect(Superview.Window.add).toHaveBeenCalledWith(pg);
   })

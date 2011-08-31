@@ -452,8 +452,23 @@
       return this.populate();
     },
     
+    /*
+      unbind listeners and nullify local variable
+      edging when resizable
+    */
     draggable: function () {
+      var self = this, z = this.z(), w = z.window();
+      console.warn('TODO: make this draggable by moving the mouse anywhere in the window')
+      function moveHandler (event) {
+        console.warn(event)
+      }
       
+      z.bind('mousedown', function () {
+        z.bind('mousemove', moveHandler);
+        z.one('mouseup', function () {
+          z.unbind('mousemove', moveHandler);
+        });
+      })
     }
   }
   

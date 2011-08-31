@@ -1,23 +1,26 @@
 <script type="text/javascript" charset="utf-8">
   
-  var Draggable = function () {
+  var DraggableSpecPage = function () {
     extend(this).mixin(Superview.Page);
   }
   
-  MyPage.prototype = {
-    // render: {
-    //       
-    //       //this._box = new Superview()
-    //       //.resize({width: 300, height: 300})
-    //       //.addTo(this);
-    //     },
+  DraggableSpecPage.prototype = {
+    render: function () {
+      var box = new Superview().render().addTo(this);
+      box.resize({width: 300, height: 300});
+      box.z().css({
+        backgroundColor: 'yellow'
+      })
+      box.draggable()
+      this._box = box;
+      return this
+    },
     bind: function () {
       return this.fitWindow();
     }
   }
   
   jQuery(function () {
-    var mpg = new MyPage().render();
-    mpg.initialize();
+    new DraggableSpecPage().initialize();
   })
 </script>

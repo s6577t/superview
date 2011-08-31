@@ -1,4 +1,4 @@
-SvPage = (function () {
+Superview.Page = (function () {
   
   var Page = function () {
     extend(this).mixin(Superview);

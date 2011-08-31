@@ -61,71 +61,72 @@ var KeyCodes = {
     /*
       View tree members
     */
+    add: function (view) {
+     this.z().append(view.elem());
+     view.addTo(this);
+     this._subviews[view.vid()] = view;
+     
+     // emit an event for listeners
+     this.onSubviewAdded().emit(view, this);
+     
+     return this;
+    },
     add: function () {
       var subviewsToAdd = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
-      subviewsToAdd.forEach(function (view) {
-        self.z().append(view.elem());
-        self._subviews[view.vid()] = view;
-        view._parent = self;
-        // emit an event for listeners
-        self.onSubviewAdded().emit(view, self);
-        view.onAdded().emit(view, self);
-      });
+      subviewsToAdd.forEach(self.add);
+      
       return this;
     },
-    // pass null to set as root view
-    addTo: function (parent) {
-      if (!parent || this._parent) return this.remove();
-      parent.add(this);
-      return this;
-    },
-    parent: function () {
-      return this._parent;
-    },
-    
     isRootView: function () { 
-      return !this.parent(); 
+      return !this.parentView(); 
     },
     rootView: function () {
       var v = this;
       while (!v.isRootView()) {
-        v = v.parent();
+        v = v.parentView();
       }
       return v;
     },
-    // () to remove from parent, an array and any number of arguments ro remove each of them
+    // pass null to set as root view
+    addTo: function (parentView) {
+      if (!parentView) return this.remove();
+      if (this._parent) throw 'parent view already set';
+      parentView._subviews[this.vid()] = this;
+      this._parent = parentView;
+      this.onAdded().emit(this, parentView);
+      return this;
+    },
+    parentView: function () {
+      return this._parent;
+    },
+    // removeSubViews(list, of, subviews) OR removeSubViews(ONE_ARRAY)
     remove: function () {
       
+      var subviewsToRemove = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
+      subviewsToRemove.forEach(function (subview) {
+        self.remove(subview);
+      });
       
-      var subviewsToRemove = null, arrayPassed = false;
-      if (arguments.length > 0) {
-        if (jQuery.isArray(arguments[0])) {
-          subviewsToRemove = arguments[0];
-          arrayPassed = true;
-        } else {
-          subviewsToRemove = Array.toArray(arguments);
-        }
-      }
-
-      if (arrayPassed || (subviewsToRemove && subviewsToRemove.length > 0)) {
-        subviewsToRemove.forEach(function (subview) {
-          subview.remove();
-        });
-        return self;
-      }
-      
+      return this;
+    },
+    remove: function (subview) {
+      subview.remove();
+      return this;
+    },
+    remove: function () {
       this.z().remove();
       
-      var parent = this._parent;
+      var parentView = this._parent;
       
       this._parent = null;
-      this.onRemoved().emit(this, parent || null);
+      this.onRemoved().emit(this, parentView || null);
       
-      if (parent) {
-        delete parent._subviews[this.vid()];
-        parent.onSubviewRemoved().emit(this, parent);
+      
+      if (parentView) {
+        delete parentView._subviews[this.vid()];
+        parentView.onSubviewRemoved().emit(this, parentView);
       }
       
       this.removeAll();
@@ -136,16 +137,8 @@ var KeyCodes = {
     removeAll: function () {
       return this.remove(this.subviews());
     },
-    subviews: function (recur) {
-      var subs = Object.values(this._subviews);
-      
-      if (recur) {
-        subs.copy().forEach(function (s) {
-          subs = subs.concat(s.subviews(recur));
-        })
-      }
-      
-      return subs;
+    subviews: function () {
+      return Object.values(this._subviews);
     },
     // rectangle related functionality
     borderMetrics: function () {
@@ -351,6 +344,7 @@ var KeyCodes = {
         
         handleSize('width');
         handleSize('height');
+        
         self.outerResize(outerRect);
       }
       
@@ -410,7 +404,7 @@ var KeyCodes = {
       return this;
     },
     bindToParent: function (binding) {
-      return this.bindTo(this.parent(), binding);
+      return this.bindTo(this.parentView(), binding);
     },
     binding: function () {
       return this._binding;
@@ -430,37 +424,6 @@ var KeyCodes = {
       }
       
       return this;
-    },
-    
-    initialize: function () {
-      var vs = this.subviews(true);
-      vs.unshift(this);
-      vs.forEach(function (view) {
-        view.bind()
-        view.populate()
-      });
-      this.onMoved().emit(this, this.rect(), this.outerRect());
-      this.onResized().emit(this, this.rect(), this.outerRect());
-      return this;
-    },
-    render: function () {
-      // NOOP default. override me!
-      return this
-    },
-    bind: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    populate: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    repopulate: function () {
-      return this.populate();
-    },
-    
-    draggable: function () {
-      
     }
   }
   
@@ -473,28 +436,21 @@ Superview.Page = (function () {
   
   var Page = function () {
     extend(this).mixin(Superview);
+    Superview.Window.install();
+    this.z().addClass('page');
   };
   
   Page.prototype = {
-    initialize: function () {
-      Superview.Window.install();
-      this.z().addClass('page');
-      this.addTo(Superview.Window);
-      this.render();
-      this.parent().initialize();
-      return this;
-    },
     fitWindow: function () {
-      return this.bindTo(Superview.Window, {
+      this.bindTo(Superview.Window, {
         width: true,
         height: true
       });
-    },
+    }
   };
   
   return Page;
 })();
-
 
 ;
 ;
@@ -553,7 +509,7 @@ Superview.Page = (function () {
 ;
 Superview.Window = (function () {
   
-  var Window = new Superview().render();
+  var Window = new Superview();
 
   function fitToWindow () {
     var w = z.window(),
@@ -592,16 +548,6 @@ Superview.Window = (function () {
       
       fitToWindow();
       w.resize(fitToWindow);
-    },
-    uninstall: function () {
-      z.body().removeClass('superview').css({
-        margin: null,
-        padding: null,
-        width: null,
-        height: null
-      });
-      Window.z().detach();
-      z.window().unbind('resize', fitToWindow);
     }
   });
   
