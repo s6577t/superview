@@ -1,14 +1,17 @@
-/ 1: fitWindow (bindTo) does not size the page until the window fires a resize event se >>a>> below
+/ 1: implement draggable and resizable so I can visually test the bindTo functionality 
 
-/ 2: implement draggable and resizable so I can visually test the bindTo functionality 
-
-/ 3: implement initialization protocol:
-  > in the ctor, assemble the view tree (not including any dynamically created views), and controller, and any styling and classes
-  > in 'bind()' (noop default) listen to events from other views and perform and bindTo()s
->>a>> The initialization sequence would then trigger onMoved() and onResized() events  
-  > in 'populate()' call controller().<populate_delegate> for initial data payload, calls 'populate()' by default
-  > in 'repopulate()' call controller().<repopulate_delegate> for latest data
-  > a recursive render function which can be called on the root view to call bind and populate recursively
-    NOTE: thinking of handling the recursion entirely from within the render function, NOT with any bindSubview() delegates etc.
+/ 2: make bindTo have sensible outer and center options
+    > probably automatically bind to inner if binding to a parent, outer otherwise
+    > bindTo(view, {
+      // this would align the box in the middle horizontally
+      // should probably post process the binding to see if it had top AND bottom (or left AND right)
+      // values for the new rect and if it has, position equally between them leaving only top/left
+      top: true|'top'|0
+      bottom: true|'bottom'|1,
+      // do similar for left and right
+      left,
+      width,
+      height
+    })
   
-/ 4: Use Superview for hyperglyphics
+/ 3: Use Superview for hyperglyphics
