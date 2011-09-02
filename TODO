@@ -1,7 +1,8 @@
-/ 1: implement draggable and resizable so I can visually test the bindTo functionality 
+/ 1: implement draggable so I can visually test the bindTo functionality 
 
-/ 2: make bindTo have sensible outer and center options
-    > probably automatically bind to inner if binding to a parent, outer otherwise
+
+/ 2: make bindTo have sensible outer and center options and offset +/-C options
+    > probably automatically bind to inner if binding to a parent/ancester, outer otherwise
     > bindTo(view, {
       // this would align the box in the middle horizontally
       // should probably post process the binding to see if it had top AND bottom (or left AND right)
@@ -13,5 +14,15 @@
       width,
       height
     })
+    
+    A) DO bindTo specs check that if passes otherView, otherRect and otherOuterRect to the top,left,bottom,right etc. functions?
+
+TEST: spec every view must be triggered onReszie/onMoved on initialize
+
+/ 3: views might have a relativePath() and path() for hashbangs. Page should return '/'.
+    > make Page appear to be the root view when it is used? 
+    > otherwise what's best to do here, also what's fastest ;)
+    // if make masquerades as the root view then parent() should return null, but _parent should still be the window
+      // ^^^ would this get ugly?
   
-/ 3: Use Superview for hyperglyphics
+/ 4: Use Superview for hyperglyphics

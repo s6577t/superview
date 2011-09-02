@@ -11,8 +11,8 @@
       'onRemoved' // (child, parent)
     );
     
-    this.onResized().throttle(100);
-    this.onMoved().throttle(100);
+    this.onResized().throttle(50);
+    this.onMoved().throttle(50);
     
     extend(this).with({
       hasViewMixin: true,
@@ -400,6 +400,10 @@
         self.unbind();
       });
       
+      // set the initial state by
+      self._bindingResizeHandler(otherView, otherView.rect(), otherView.outerRect());
+      self._bindingMoveHandler(otherView, otherView.rect(), otherView.outerRect());
+
       return this;
     },
     bindToParent: function (binding) {
@@ -432,8 +436,6 @@
         view.bind()
         view.populate()
       });
-      this.onMoved().emit(this, this.rect(), this.outerRect());
-      this.onResized().emit(this, this.rect(), this.outerRect());
       return this;
     },
     render: function () {
@@ -448,7 +450,7 @@
       // NOOP. Override me!
       return this;
     },
-    repopulate: function () {
+    update: function () {
       return this.populate();
     },
     
@@ -457,16 +459,30 @@
       edging when resizable
     */
     draggable: function () {
-      var self = this, z = this.z(), w = z.window();
-      console.warn('TODO: make this draggable by moving the mouse anywhere in the window')
+      
+      var self = this, thiz = this.z(), w = z.window();
+      
+      // for smoother dragging action
+      self.onMoved().throttle(5);
+      
+      var prev = null
+      
       function moveHandler (event) {
-        console.warn(event)
+        var r = self.outerRect();
+        var dx = event.pageX - prev.pageX,
+            dy = event.pageY - prev.pageY;
+        
+        self.moveTo({top: r.top + dy, left: r.left + dx});
+        prev = event;
       }
       
-      z.bind('mousedown', function () {
-        z.bind('mousemove', moveHandler);
-        z.one('mouseup', function () {
-          z.unbind('mousemove', moveHandler);
+      thiz.bind('mousedown', function (event) {
+        
+        prev = event;
+                
+        w.bind('mousemove', moveHandler);
+        w.one('mouseup', function () {
+          w.unbind('mousemove', moveHandler);
         });
       })
     }

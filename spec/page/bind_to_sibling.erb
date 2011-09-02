@@ -1,10 +1,10 @@
 <script type="text/javascript" charset="utf-8">
   
-  var DraggableSpecPage = function () {
+  var BindToSibling = function () {
     extend(this).mixin(Superview.Page);
   }
   
-  DraggableSpecPage.prototype = {
+  BindToSibling.prototype = {
     render: function () {
       var container = new Superview().render().addTo(this);
       container.z().css({
@@ -34,7 +34,20 @@
       box.z().css({
         backgroundColor: 'yellow'
       })
-      box.draggable()
+      box.draggable();
+      
+      var box2 = new Superview().render().addTo(container);
+      box2.z().css({
+        backgroundColor: 'pink'
+      })
+      box2.bind = function () {
+        this.bindTo(box, {
+          top: true,
+          left: 'right',
+          width: true,
+          height: true
+        })
+      }
       
       this._box = box;
       return this
@@ -45,6 +58,6 @@
   }
   
   jQuery(function () {
-    new DraggableSpecPage().initialize();
+    new BindToSibling().initialize();
   })
 </script>

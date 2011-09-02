@@ -1,0 +1,19 @@
+1) JQUERY is a dependency for supermodel
+	(standard!)
+	
+2) NO CSS by default
+* CSS was supposed to separate presentation from content (HTML)
+* but now, we do layout in the javascript and most importantly...
+* views ARE our separation from content.
+* we've gone beyond static documents and need more powerful technologies (hence SCSS)
+
+3) Every view can have a controller. Views create and manage subviews. A view can set itself a controller
+which would be responsible for handling view events and mapping changes to the model. Views know about subviews,
+controllers only know about the view they are attached to and the model.
+CONTROLLER: 
+* map between VIEW and MODEL events and updates
+* handle any socket or browser based events that affect the controllers view
+VIEW: display data, emit events such that controllers can effectively receive and update the model
+MODEL: hold data and logic, emit events such that controllers can effectively receive and update the view
+
+

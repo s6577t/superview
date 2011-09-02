@@ -83,11 +83,11 @@ describe('superview', function () {
     })
   })
   
-  describe('repopulate()', function () {
+  describe('update()', function () {
     it('should call populate by default', function () {
       var v = new Superview;
       spyOn(v, 'populate');
-      v.repopulate();
+      v.update();
       expect(v.populate).toHaveBeenCalled();
     })
   })
