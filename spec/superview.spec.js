@@ -64,18 +64,6 @@ describe('superview', function () {
       expect(callOrder).toContain(c);
     })
     
-    it('should emit onMoved and onResized events after binding and before populating', function () {
-      var v = new Superview;
-      
-      spyOn(v.onMoved(), 'emit');
-      spyOn(v.onResized(), 'emit');
-      
-      v.initialize();
-      
-      expect(v.onMoved().emit).toHaveBeenCalled();
-      expect(v.onResized().emit).toHaveBeenCalled();
-    })
-    
     it('should be chainable', function () {
       var v = new Superview();
       var r = v.initialize();

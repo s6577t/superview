@@ -13,18 +13,12 @@
       container.bind = function () {
         var self = this;
         this.bindToParent({
-          width: function (parent) {
-            return parent.rect().width - 30
-          },
-          height: function (parent) {
-            return parent.rect().height - 30
-          },
-          left: function (parent) {
-            return (parent.rect().width / 2.0) - ((parent.rect().width - 30) / 2.0)
-          },
-          top: function (parent) {
-            return (parent.rect().height / 2.0) - ((parent.rect().height - 30) / 2.0)
-          }
+          width: '-30',
+          height: '-30',
+          left: true,
+          right: true,
+          top: true,
+          bottom: true
         })
       }
       this._container = container;

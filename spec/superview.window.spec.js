@@ -4,7 +4,7 @@ describe('superview.window', function () {
     w = Superview.Window;
   });
   afterEach(function () {
-    w.uninstall();
+    w._uninstall();
   })
   
   describe('when installed', function () {

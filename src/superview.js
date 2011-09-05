@@ -11,8 +11,8 @@
       'onRemoved' // (child, parent)
     );
     
-    this.onResized().throttle(50);
-    this.onMoved().throttle(50);
+    this.onResized().throttle(10);
+    this.onMoved().throttle(10);
     
     extend(this).with({
       hasViewMixin: true,
@@ -76,13 +76,22 @@
     parent: function () {
       return this._parent;
     },
+    ancestors: function () {
+      var ancestors = [];
+      var current = this.parent();
+      while (current) {
+        ancestors.push(current);
+        current = current.parent()
+      }
+      return ancestors;
+    },
     
-    isRootView: function () { 
+    isRoot: function () { 
       return !this.parent(); 
     },
-    rootView: function () {
+    root: function () {
       var v = this;
-      while (!v.isRootView()) {
+      while (!v.isRoot()) {
         v = v.parent();
       }
       return v;
@@ -316,11 +325,17 @@
       if (self.binding()) self.unbind();
       
       self._binding = binding;
-      binding.otherView = otherView;
+      extend(binding).with({
+        otherView: otherView,
+        bindToOuterRect: !self.ancestors().contains(otherView),
+        bindOuterRect: true
+      });
       
       self._bindingResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
         var binding = self._binding;
-        var outerRect = self.outerRect();
+        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
+        var boundRect = binding.bindOuterRect ? self.outerRect() : self.rect();
+        var resize = binding.bindOuterRect ? self.outerResize : self.resize;
         
         function handleSize (dimension) {
           switch (typeof binding[dimension]) {
@@ -328,15 +343,21 @@
               break;
             case 'boolean':
               if (binding[dimension]) {
-                outerRect[dimension] = otherViewRect[dimension];
+                boundRect[dimension] = bindToRect[dimension];
               }
               break;
             case 'number':
-              outerRect[dimension] = otherViewRect[dimension] * binding[dimension];
+              boundRect[dimension] = bindToRect[dimension] * binding[dimension];
               break;
             case 'function':
-              outerRect[dimension] = binding[dimension](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[dimension] = binding[dimension](otherView, otherViewRect, otherViewOuterRect);
               break;
+            case 'string':
+              var expr = binding[dimension];
+              if (expr.match(/^[\+-]\d+$/)) {
+                boundRect[dimension] = eval(bindToRect[dimension]+expr);
+                break;
+              }
             default:
               throw new Error("Invalid binding for "+dimension+": " + binding[dimension]);
           }
@@ -344,12 +365,14 @@
         
         handleSize('width');
         handleSize('height');
-        self.outerResize(outerRect);
+        resize.call(self, boundRect);
       }
       
       self._bindingMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
         var binding = self._binding;
-        var newOuterRect = {};
+        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
+        var moveTo = binding.bindOuterRect ? self.outerMoveTo : self.moveTo;
+        var boundRect = {};
         
         function handlePosition (position, dimension, opposite) {
           switch (typeof binding[position]) {
@@ -357,27 +380,35 @@
               break;
             case 'boolean':
               if (binding[position]) {
-                newOuterRect[position] = otherViewOuterRect[position];
+                boundRect[position] = bindToRect[position];
               }
               break;
             case 'number':
-              newOuterRect[position] = otherViewRect[dimension] * binding[position];
+              boundRect[position] = bindToRect[dimension] * binding[position];
               break;
             case 'string':
+              // check if it is an offset expression
+              var expr = binding[position];
+              if (expr.match(/^[\+-]\d+$/)) {
+                boundRect[position] = eval(bindToRect[position]+expr);
+                break;
+              }
+              
+              // otherwise maybe it is 'top'/'bottom' or 'left'/'right'
               var stringHandled = true;
               switch (binding[position]) {
                 case position:
-                  newOuterRect[position] = otherViewOuterRect[position];
+                  boundRect[position] = bindToRect[position];
                   break;
                 case opposite:
-                  newOuterRect[position] = otherViewOuterRect[opposite];
+                  boundRect[position] = bindToRect[opposite];
                   break;
                 default:
                   stringHandled = false;
               }
               if (stringHandled) break;
             case 'function':
-              newOuterRect[position] = binding[position](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[position] = binding[position](otherView, otherViewRect, otherViewOuterRect);
               break;
             default:
               throw new Error("Invalid binding for " + position + ": " + binding[position]);
@@ -389,7 +420,19 @@
         handlePosition('left', 'width', 'right');
         handlePosition('right', 'width', 'left');
         
-        self.outerMoveTo(newOuterRect);
+        if (typeof boundRect.top === 'number' && typeof boundRect.bottom === 'number') {
+          var halfHeight = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).height / 2;
+          boundRect.top = boundRect.top + ((boundRect.bottom - boundRect.top) / 2) - halfHeight;
+          delete boundRect.bottom;
+        }
+
+        if (typeof boundRect.left === 'number' && typeof boundRect.right === 'number') {
+          var halfWidth = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).width / 2;
+          boundRect.left = boundRect.left + ((boundRect.right - boundRect.left) / 2) - halfWidth;
+          delete boundRect.right;
+        }
+        
+        moveTo.call(self, boundRect);
       };
       
       otherView.onResized(self._bindingResizeHandler);
@@ -407,7 +450,7 @@
       return this;
     },
     bindToParent: function (binding) {
-      return this.bindTo(this.parent(), binding);
+      return this.isRoot() ? this : this.bindTo(this.parent(), binding);
     },
     binding: function () {
       return this._binding;

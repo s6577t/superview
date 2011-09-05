@@ -394,6 +394,14 @@ var KeyCodes = {
               boundRect[position] = bindToRect[dimension] * binding[position];
               break;
             case 'string':
+              // check if it is an offset expression
+              var expr = binding[position];
+              if (expr.match(/^[\+-]\d+$/)) {
+                boundRect[position] = eval(bindToRect[position]+expr);
+                break;
+              }
+              
+              // otherwise maybe it is 'top'/'bottom' or 'left'/'right'
               var stringHandled = true;
               switch (binding[position]) {
                 case position:
@@ -418,6 +426,18 @@ var KeyCodes = {
         handlePosition('bottom', 'height','top');
         handlePosition('left', 'width', 'right');
         handlePosition('right', 'width', 'left');
+        
+        if (typeof boundRect.top === 'number' && typeof boundRect.bottom === 'number') {
+          var halfHeight = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).height / 2;
+          boundRect.top = boundRect.top + ((boundRect.bottom - boundRect.top) / 2) - halfHeight;
+          delete boundRect.bottom;
+        }
+
+        if (typeof boundRect.left === 'number' && typeof boundRect.right === 'number') {
+          var halfWidth = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).width / 2;
+          boundRect.left = boundRect.left + ((boundRect.right - boundRect.left) / 2) - halfWidth;
+          delete boundRect.right;
+        }
         
         moveTo.call(self, boundRect);
       };

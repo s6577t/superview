@@ -2,19 +2,19 @@ describe("view tree related behaviour", function () {
   
   it('is a root when it has no parent', function () {
     var root = new View1
-    expect(root.isRootView()).toBeTruthy()
+    expect(root.isRoot()).toBeTruthy()
   })
   
-  it('should return the root view with rootView()', function () {
+  it('should return the root view with root()', function () {
     var v1 = new Superview, v2 = new Superview, v3 = new Superview;
     v1.add(v2);
     v2.add(v3);
-    expect(v3.rootView()).toBe(v1);
+    expect(v3.root()).toBe(v1);
   })
   
   it('is not a root when it has a parent', function () {
     var notRoot = new View1().addTo(new View1())
-    expect(notRoot.isRootView()).toBeFalsy();
+    expect(notRoot.isRoot()).toBeFalsy();
   })
 
   describe('adding subviews', function () {
@@ -298,5 +298,30 @@ describe("view tree related behaviour", function () {
     });
   });
 
+  describe('ancestors()', function () {
+    var view, parent, parent2, root, anotherView;
+    
+    beforeEach(function () {
+      view = new Superview()
+      parent = new Superview()
+      parent2 = new Superview()
+      root = new Superview()
+      anotherView = new Superview().addTo(parent);
+      
+      view.addTo(
+        parent.addTo(
+          parent2.addTo(
+            root)));
+    })
+    
+    it("should return a list of all ancestors including the parent in deepest first order", function() {
+      var ancestors = view.ancestors();
+      
+      expect(ancestors.length).toEqual(3);
+      expect(ancestors[0]).toBe(parent);
+      expect(ancestors[1]).toBe(parent2);
+      expect(ancestors[2]).toBe(root);
+    });
+  })
 });
 

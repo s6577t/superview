@@ -1,28 +1,12 @@
-/ 1: implement draggable so I can visually test the bindTo functionality 
+/ next: Supermodel
 
-
-/ 2: make bindTo have sensible outer and center options and offset +/-C options
-    > probably automatically bind to inner if binding to a parent/ancester, outer otherwise
-    > bindTo(view, {
-      // this would align the box in the middle horizontally
-      // should probably post process the binding to see if it had top AND bottom (or left AND right)
-      // values for the new rect and if it has, position equally between them leaving only top/left
-      top: true|'top'|0
-      bottom: true|'bottom'|1,
-      // do similar for left and right
-      left,
-      width,
-      height
-    })
-    
-    A) DO bindTo specs check that if passes otherView, otherRect and otherOuterRect to the top,left,bottom,right etc. functions?
-
-TEST: spec every view must be triggered onReszie/onMoved on initialize
 
 / 3: views might have a relativePath() and path() for hashbangs. Page should return '/'.
     > make Page appear to be the root view when it is used? 
     > otherwise what's best to do here, also what's fastest ;)
     // if make masquerades as the root view then parent() should return null, but _parent should still be the window
       // ^^^ would this get ugly?
+    // return vid as path by default
+    // probably need an activate[d] event/function
+    // Explore html5 viewstate
   
-/ 4: Use Superview for hyperglyphics

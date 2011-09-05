@@ -41,12 +41,14 @@ Superview.Window = (function () {
       fitToWindow();
       w.resize(fitToWindow);
     },
-    uninstall: function () {
+    // only use this for testing
+    _uninstall: function () {
       z.body().removeClass('superview').css({
-        margin: null,
-        padding: null,
-        width: null,
-        height: null
+        margin: 0,
+        padding: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'scroll'
       });
       Window.z().detach();
       z.window().unbind('resize', fitToWindow);
