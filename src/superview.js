@@ -48,7 +48,7 @@
     elem: function () { 
       return this._zElem.elem(); 
     },
-    z: function () { 
+    $: function () { 
       return this._zElem; 
     },
     /*
@@ -58,7 +58,7 @@
       var subviewsToAdd = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
       subviewsToAdd.forEach(function (view) {
-        self.z().append(view.elem());
+        self.$().append(view.elem());
         self._subviews[view.vid()] = view;
         view._parent = self;
         // emit an event for listeners
@@ -118,7 +118,7 @@
         return self;
       }
       
-      this.z().remove();
+      this.$().remove();
       
       var parent = this._parent;
       
@@ -152,7 +152,7 @@
     // rectangle related functionality
     borderMetrics: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var m = {
         top:    parseFloat(z.css('borderTopWidth')) || 0 ,
         right:  parseFloat(z.css('borderRightWidth')) || 0,
@@ -167,7 +167,7 @@
     },
     paddingMetrics: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       
       var m = {
         top:    parseFloat(z.css('paddingTop')) || 0 ,
@@ -184,7 +184,7 @@
     
     resize: function (s) {
       var resized = false;
-      var z = this.z();
+      var z = this.$();
       var r = this.rect();
       
       if (Superview.Rect.hasWidth(s) && s.width != r.width) {
@@ -206,7 +206,7 @@
       return this;
     },
     outerResize: function (s) {
-      var z = this.z();
+      var z = this.$();
       
       if (Superview.Rect.hasWidth(s)) {
         s.width = s.width - (this.paddingMetrics().width + this.borderMetrics().width);
@@ -221,7 +221,7 @@
     
     moveTo: function (p) {
       var moved = false;
-      var z = this.z();
+      var z = this.$();
       var r = this.rect();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
@@ -253,7 +253,7 @@
       return this;
     },
     outerMoveTo: function (p) {
-      var z = this.z();
+      var z = this.$();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
       
@@ -280,7 +280,7 @@
     
     rect: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var p = {
         left: parseFloat(z.css('left')),
         top: parseFloat(z.css('top'))
@@ -300,7 +300,7 @@
     },
     outerRect: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var p = {
         left: parseFloat(z.css('left')),
         top: parseFloat(z.css('top'))
@@ -503,7 +503,7 @@
     */
     draggable: function () {
       
-      var self = this, thiz = this.z(), w = z.window();
+      var self = this, thiz = this.$(), w = z.window();
       
       // for smoother dragging action
       self.onMoved().throttle(5);

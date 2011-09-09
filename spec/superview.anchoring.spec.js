@@ -6,7 +6,7 @@ describe("anchor layout behaviour", function () {
     view = new Superview;
     otherView = new Superview;
 
-    view.z().css('borderWidth', 10);
+    view.$().css('borderWidth', 10);
   });
   
   describe("anchorTo()", function () {
@@ -772,7 +772,7 @@ describe("anchor layout behaviour", function () {
     
     describe('anchoring with anchorOuterRect', function () {
       it('should anchor the inner rectangle when false', function () {
-        otherView.z().css('borderWidth', 10);
+        otherView.$().css('borderWidth', 10);
         
         view.anchorTo(otherView, {
           top: true,
@@ -795,7 +795,7 @@ describe("anchor layout behaviour", function () {
         expect(r.left).toBe(r2.left);
       })
       it('should anchor the outer rectangle when true', function () {
-        otherView.z().css('borderWidth', 10);
+        otherView.$().css('borderWidth', 10);
         
         view.anchorTo(otherView, {
           top: true,
@@ -825,7 +825,7 @@ describe("anchor layout behaviour", function () {
     
     describe('anchoring with anchorToOuterRect', function () {
       it("should anchor to the inner rect of otherView when false", function() {
-        otherView.z().css('borderWidth', 10);
+        otherView.$().css('borderWidth', 10);
         
         view.anchorTo(otherView, {
           top: true,
@@ -848,7 +848,7 @@ describe("anchor layout behaviour", function () {
       });
 
       it("should anchor to outerRect of otherView when true", function() {
-        otherView.z().css('borderWidth', 10);
+        otherView.$().css('borderWidth', 10);
 
         view.anchorTo(otherView, {
           top: true,

@@ -36,7 +36,7 @@ Superview.Window = (function () {
         overflow: 'hidden'
       });
       
-      Window.z().addClass('window').appendTo(body);
+      Window.$().addClass('window').appendTo(body);
       
       fitToWindow();
       w.resize(fitToWindow);
@@ -50,7 +50,7 @@ Superview.Window = (function () {
         height: '100%',
         overflow: 'scroll'
       });
-      Window.z().detach();
+      Window.$().detach();
       z.window().unbind('resize', fitToWindow);
     }
   });

@@ -7,13 +7,13 @@
   RectsPage.prototype = {
     render: function () {
       var box1 = new Superview().render().addTo(this);
-      box1.resize({width: 300, height: 300}).z().css({
+      box1.resize({width: 300, height: 300}).$().css({
         backgroundColor: 'yellow',
         border: 'solid 5px red'
       });
       
       var box2 = new Superview().render().addTo(this);
-      box2.resize({width: 300, height: 300}).moveTo({top: 450, left: 50}).z().css({
+      box2.resize({width: 300, height: 300}).moveTo({top: 450, left: 50}).$().css({
         backgroundColor: 'green',
         border: 'solid 5px blue'
       });;

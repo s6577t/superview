@@ -7,7 +7,7 @@
   AnchorToSibling.prototype = {
     render: function () {
       var container = new Superview().render().addTo(this);
-      container.z().css({
+      container.$().css({
         backgroundColor: '#3020FF'
       });
       container.anchor = function () {
@@ -31,13 +31,13 @@
       
       var box = new Superview().render().addTo(container);
       box.resize({width: 200, height: 200}).moveTo({top: 30, left: 50});
-      box.z().css({
+      box.$().css({
         backgroundColor: 'yellow'
       })
       box.draggable();
       
       var box2 = new Superview().render().addTo(container);
-      box2.z().css({
+      box2.$().css({
         backgroundColor: 'pink'
       })
       box2.anchor = function () {

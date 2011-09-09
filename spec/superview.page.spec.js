@@ -4,7 +4,7 @@ describe('superview.page', function () {
     pg = new Superview.Page().initialize();
   })
   it('should have css class "page"', function () {
-    expect(pg.z().hasClass('page')).toBe(true);
+    expect(pg.$().hasClass('page')).toBe(true);
   });
   it('should be appended to the window', function () {
     spyOn(Superview.Window, 'add').andCallThrough();

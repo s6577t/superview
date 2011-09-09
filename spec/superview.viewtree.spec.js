@@ -87,9 +87,9 @@ describe("view tree related behaviour", function () {
     });
     
     it('should append a subview to the parent views dom', function () {
-      child.z().id('woof');
+      child.$().id('woof');
       child.addTo(parent);
-      expect(parent.z().find('#woof').toArray()).not.toBeEmpty();
+      expect(parent.$().find('#woof').toArray()).not.toBeEmpty();
     })    
 
     it('should call remove() if setting the parent view to null or undefined', function () {

@@ -29,12 +29,12 @@ describe('superview', function () {
     })
   
     it("can provide the jquery result of DOM building with the 'z' library", function () {
-      expect(new View1().z()).toBeInstanceOf(jQuery);
+      expect(new View1().$()).toBeInstanceOf(jQuery);
     });
     
     it('should initialize its div container as position:absolute display:inline-block', function () {
-      expect(new View1().z().css('position')).toEqual('absolute');
-      expect(new View1().z().css('display')).toEqual('inline-block');
+      expect(new View1().$().css('position')).toEqual('absolute');
+      expect(new View1().$().css('display')).toEqual('inline-block');
     })
   })
   

@@ -7,7 +7,7 @@ Superview.Page = (function () {
   Page.prototype = {
     initialize: function () {
       Superview.Window.install();
-      this.z().addClass('page');
+      this.$().addClass('page');
       this.addTo(Superview.Window);
       this.render();
       this.parent().initialize();

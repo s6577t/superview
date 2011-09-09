@@ -4,8 +4,8 @@ describe('getting/setting the size of an element', function () {
   it('should pass on the dimensions to the dom element', function () {
     var v = new Superview();
     v.resize({width: 123, height: 456});
-    expect(v.z().width()).toEqual(123);
-    expect(v.z().height()).toEqual(456);
+    expect(v.$().width()).toEqual(123);
+    expect(v.$().height()).toEqual(456);
   });
   
   it('should emit an onResized event with the view,rect,outerRect', function () {
@@ -44,7 +44,7 @@ describe('getting/setting the outer size of the element', function () {
   it('should set the size inclusive of padding and border', function () {
     
     var v = new Superview();
-    v.z().css({
+    v.$().css({
       border: 'solid 10px black',
       padding: 10
     });
@@ -59,8 +59,8 @@ describe('getting/setting the outer size of the element', function () {
   it('should retrieve the size inclusive of border and padding', function () {
     var v = new Superview();
     v.outerResize({width: 123, height: 456});
-    expect(v.z().outerWidth()).toEqual(123);
-    expect(v.z().outerHeight()).toEqual(456);
+    expect(v.$().outerWidth()).toEqual(123);
+    expect(v.$().outerHeight()).toEqual(456);
   });
   
   it('should pass on the call to resize', function () {
@@ -114,7 +114,7 @@ describe('moving the inner position of an element', function () {
   it('should correctly set the position with disregard for border and padding', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       borderWidth: 5,
       padding: 15
     });
@@ -139,7 +139,7 @@ describe('moving the inner position of an element', function () {
   it('should translate calls with right/bottom to calls with left/top', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       borderWidth: 5,
       padding: 15
     });
@@ -166,7 +166,7 @@ describe('moving the outer positon of an element (outerMoveTo())', function () {
   it('should move the element relative to the view area incl border and padding', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       border: 'solid 3px black',
       padding: 17
     });
@@ -191,7 +191,7 @@ describe('moving the outer positon of an element (outerMoveTo())', function () {
   it('should translate right/bottom into left/top', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       border: 'solid 3px black',
       padding: 17
     });
@@ -233,7 +233,7 @@ describe('rect()', function () {
   it('should returns the width, height top and left of the element excluding border and padding', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       border: 'solid 15px red',
       padding: 5
     });
@@ -256,7 +256,7 @@ describe('outerRect()', function () {
   it('should returns the width, height top and left of the element including border and padding', function () {
     var v = new Superview();
     
-    v.z().css({
+    v.$().css({
       border: 'solid 15px red',
       padding: 5
     }); 
@@ -280,7 +280,7 @@ describe('paddingMetrics()', function () {
   
   beforeEach(function () {
     v = new Superview();
-    v.z().css({
+    v.$().css({
       paddingTop: 1,
       paddingBottom: 2,
       paddingLeft: 3,
@@ -313,7 +313,7 @@ describe('borderMetrics()', function () {
   
   beforeEach(function () {
     v = new Superview();
-    v.z().css({
+    v.$().css({
       borderTop: 1,
       borderBottom: 2,
       borderLeft: 3,
