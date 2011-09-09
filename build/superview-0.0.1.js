@@ -161,10 +161,10 @@ var KeyCodes = {
       var self = this;
       var z = this.z();
       var m = {
-        top:    parseFloat(z.css('borderTopWidth')) || 0 ,
-        right:  parseFloat(z.css('borderRightWidth')) || 0,
-        bottom: parseFloat(z.css('borderBottomWidth')) || 0,
-        left:   parseFloat(z.css('borderLeftWidth')) || 0
+        top:    parseFloat(z.css('borderTopWidth'), 10) || 0 ,
+        right:  parseFloat(z.css('borderRightWidth'), 10) || 0,
+        bottom: parseFloat(z.css('borderBottomWidth'), 10) || 0,
+        left:   parseFloat(z.css('borderLeftWidth'), 10) || 0
       }
       
       m.width = m.right + m.left;
@@ -177,10 +177,10 @@ var KeyCodes = {
       var z = this.z();
       
       var m = {
-        top:    parseFloat(z.css('paddingTop')) || 0 ,
-        right:  parseFloat(z.css('paddingRight')) || 0,
-        bottom: parseFloat(z.css('paddingBottom')) || 0,
-        left:   parseFloat(z.css('paddingLeft')) || 0
+        top:    parseFloat(z.css('paddingTop'), 10) || 0 ,
+        right:  parseFloat(z.css('paddingRight'), 10) || 0,
+        bottom: parseFloat(z.css('paddingBottom'), 10) || 0,
+        left:   parseFloat(z.css('paddingLeft'), 10) || 0
       }
       
       m.width = m.right + m.left;
@@ -289,8 +289,8 @@ var KeyCodes = {
       var self = this;
       var z = this.z();
       var p = {
-        left: parseFloat(z.css('left')),
-        top: parseFloat(z.css('top'))
+        left: parseFloat(z.css('left'), 10),
+        top: parseFloat(z.css('top'), 10)
       };
   
       var r = {
@@ -309,8 +309,8 @@ var KeyCodes = {
       var self = this;
       var z = this.z();
       var p = {
-        left: parseFloat(z.css('left')),
-        top: parseFloat(z.css('top'))
+        left: parseFloat(z.css('left'), 10),
+        top: parseFloat(z.css('top'), 10)
       };
       
       var r = {
