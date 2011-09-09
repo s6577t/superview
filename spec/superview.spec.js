@@ -39,7 +39,7 @@ describe('superview', function () {
   })
   
   describe("initialization protocol", function () {
-    it('should bind and then populate the view tree recursively', function () {
+    it('should anchor and then populate the view tree recursively', function () {
       
       var a = new Superview, b = new Superview, c = new Superview;
       a.add(b, c);
@@ -49,9 +49,9 @@ describe('superview', function () {
         callOrder.push(this);
       }
       
-      a.bind = f;
-      b.bind = f;
-      c.bind = f;
+      a.anchor = f;
+      b.anchor = f;
+      c.anchor = f;
       
       a.populate = f;
       b.populate = f;

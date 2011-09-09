@@ -10,9 +10,9 @@
       container.z().css({
         backgroundColor: '#3020FF'
       });
-      container.bind = function () {
+      container.anchor = function () {
         var self = this;
-        this.bindToParent({
+        this.anchorToParent({
           width: '-30',
           height: '-30',
           left: true,
@@ -33,7 +33,7 @@
       this._box = box;
       return this
     },
-    bind: function () {
+    anchor: function () {
       return this.fitWindow();
     }
   }

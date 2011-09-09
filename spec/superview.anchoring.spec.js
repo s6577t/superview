@@ -1,4 +1,4 @@
-describe("bind layout behaviour", function () {
+describe("anchor layout behaviour", function () {
   
   var view, otherView;
 
@@ -9,13 +9,13 @@ describe("bind layout behaviour", function () {
     view.z().css('borderWidth', 10);
   });
   
-  describe("bindTo()", function () {
+  describe("anchorTo()", function () {
     it ('should be chainable', function () {
-      var rtn = view.bindTo(otherView, {});
+      var rtn = view.anchorTo(otherView, {});
       expect(rtn).toBe(view);
     });
-    it ("should set the initial position of view based on the binding to otherView", function() {
-      view.bindTo(otherView, {
+    it ("should set the initial position of view based on the anchoring to otherView", function() {
+      view.anchorTo(otherView, {
         top: function () { return 6 },
         width: function () { return 23 }
       });
@@ -25,23 +25,23 @@ describe("bind layout behaviour", function () {
       expect(r.width).toEqual(23);
       expect(r.top).toEqual(6);
     })    
-    it ('should unbind any current binding before making a new binding', function() {
-      view.bindTo(otherView, {});
-      spyOn(view, 'unbind');
-      view.bindTo(new Superview(), {});
-      expect(view.unbind).toHaveBeenCalled();
+    it ('should deanchor any current anchoring before making a new anchoring', function() {
+      view.anchorTo(otherView, {});
+      spyOn(view, 'deanchor');
+      view.anchorTo(new Superview(), {});
+      expect(view.deanchor).toHaveBeenCalled();
     })
   
-    describe("binding to the width of the other view", function () {
-      it ("should not throw an error if the height binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring to the width of the other view", function () {
+      it ("should not throw an error if the height anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.resize({width: 123, height: 456});
       });
       describe('with an offset described as a string', function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 width: "23"
               });
             }
@@ -49,22 +49,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 width: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             width: '+123'
           })
           otherView.outerResize({width: 200})
           expect(view.outerRect().width).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             width: '-46'
           })
           otherView.outerResize({width: 200})
@@ -74,7 +74,7 @@ describe("bind layout behaviour", function () {
       describe("with true indicating match the view outer width with the otherView width", function () {
         it('should match the OUTER width of the bound view to the inner width of the otherView', function () {
         
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             width: true
           });
         
@@ -91,7 +91,7 @@ describe("bind layout behaviour", function () {
         });
         it('should match the outer width of the bound view to the outer width of the otherView', function () {
         
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             width: true
           });
         
@@ -105,7 +105,7 @@ describe("bind layout behaviour", function () {
         
           var v, otherRect, otherOuterRect;
         
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             width: function (a, b, c) {
              v = a;
              otherRect = b;
@@ -128,7 +128,7 @@ describe("bind layout behaviour", function () {
       })
       describe("with number representing a fraction of the other view width", function () {
         it("should set the view outer width to a fraction fo the otherView width", function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             width: 1.8
           });
           otherView.resize({width: 100, height: 2});
@@ -136,16 +136,16 @@ describe("bind layout behaviour", function () {
         })
       })
     });
-    describe("binding to the height of the other view", function () {
-      it ("should not throw an error if the height binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring to the height of the other view", function () {
+      it ("should not throw an error if the height anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.resize({width: 123, height: 456});
       });
       describe('with an offset described as a string', function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 height: "23"
               });
             }
@@ -153,22 +153,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 height: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             height: '+123'
           })
           otherView.outerResize({height: 200})
           expect(view.outerRect().height).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             height: '-46'
           })
           otherView.outerResize({height: 200})
@@ -179,7 +179,7 @@ describe("bind layout behaviour", function () {
       describe("with true indicating match the view outer height with the otherView height", function () {
         it('should match the OUTER height of the bound view to the inner height of the otherView', function () {
         
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             height: true
           });
         
@@ -200,7 +200,7 @@ describe("bind layout behaviour", function () {
         
           var v, otherRect, otherOuterRect;
         
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             height: function (a, b, c) {
              v = a;
              otherRect = b;
@@ -223,7 +223,7 @@ describe("bind layout behaviour", function () {
       })
       describe("with number representing a fraction of the other view height", function () {
         it("should set the view outer height to a fraction fo the otherView height", function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             height: 1.8
           });
           otherView.resize({width: 100, height: 200});
@@ -231,14 +231,14 @@ describe("bind layout behaviour", function () {
         })
       })
     });
-    describe("binding the top of the view", function () {
-      it ("should not throw an error if the top binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring the top of the view", function () {
+      it ("should not throw an error if the top anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.outerMoveTo({top: 123, left: 456});
       });
       describe("with true", function () {
-        it('should bind to the top of the otherView', function () {
-          view.bindTo(otherView, {
+        it('should anchor to the top of the otherView', function () {
+          view.anchorTo(otherView, {
             top: true
           });
         
@@ -248,8 +248,8 @@ describe("bind layout behaviour", function () {
         });
       });
       describe('with "top"', function() {
-        it ('should bind to the top of the other view', function () {
-          view.bindTo(otherView, {
+        it ('should anchor to the top of the other view', function () {
+          view.anchorTo(otherView, {
             top: 'top'
           });
         
@@ -259,8 +259,8 @@ describe("bind layout behaviour", function () {
         });
       })
       describe("with 'bottom'", function () {
-        it("should bind to the bottom of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor to the bottom of the other view", function () {
+          view.anchorTo(otherView, {
             top: 'bottom'
           });
         
@@ -274,7 +274,7 @@ describe("bind layout behaviour", function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 top: "23"
               });
             }
@@ -282,22 +282,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 top: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             top: '+123'
           })
           otherView.moveTo({top: 200})
           expect(view.outerRect().top).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             top: '-46'
           })
           otherView.outerMoveTo({top: 200})
@@ -305,8 +305,8 @@ describe("bind layout behaviour", function () {
         })
       })
       describe("with a number", function () {
-        it("should bind the top of the view to the number multiplied by the height of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor the top of the view to the number multiplied by the height of the other view", function () {
+          view.anchorTo(otherView, {
             top: 0.2
           });
         
@@ -318,7 +318,7 @@ describe("bind layout behaviour", function () {
       });
       describe('with a function', function () {
         it ('should set the outer top position of the view to the value returned by the function', function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             top: function (other, oRect, oOuterRect) {
               return 5134;
             }
@@ -328,13 +328,13 @@ describe("bind layout behaviour", function () {
         
           expect(view.outerRect().top).toEqual(5134);
         });
-        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when bindingToOuterRect', function () {
+        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when anchoringToOuterRect', function () {
           var rect = {}
           var outerRect = {}
           spyOn(otherView, 'outerRect').andReturn(outerRect);
           spyOn(otherView, 'rect').andReturn(rect);
           
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             top: function (o, or, oor) {
               expect(o).toBe(otherView)
               expect(or).toBe(rect)
@@ -344,14 +344,14 @@ describe("bind layout behaviour", function () {
         })
       })
     });
-    describe("binding the bottom of the view", function () {
-      it ("should not throw an error if the bottom binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring the bottom of the view", function () {
+      it ("should not throw an error if the bottom anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.outerMoveTo({top: 123, left: 456});
       });
       describe("with true", function () {
-        it('should bind to the top of the otherView', function () {
-          view.bindTo(otherView, {
+        it('should anchor to the top of the otherView', function () {
+          view.anchorTo(otherView, {
             bottom: true
           });
         
@@ -362,8 +362,8 @@ describe("bind layout behaviour", function () {
         });
       });
       describe('with "bottom"', function(){
-        it ('should bind to the bottom of the other view', function () {
-          view.bindTo(otherView, {
+        it ('should anchor to the bottom of the other view', function () {
+          view.anchorTo(otherView, {
             bottom: 'bottom'
           });
         
@@ -374,8 +374,8 @@ describe("bind layout behaviour", function () {
         });
       })
       describe("with 'top'", function () {
-        it("should bind to the bottom of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor to the bottom of the other view", function () {
+          view.anchorTo(otherView, {
             bottom: 'top'
           });
           view.outerResize({width: 200, height: 300});
@@ -388,7 +388,7 @@ describe("bind layout behaviour", function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 bottom: "23"
               });
             }
@@ -396,22 +396,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 bottom: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             bottom: '+123'
           })
           otherView.moveTo({bottom: 200})
           expect(view.outerRect().bottom).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             bottom: '-46'
           })
           otherView.outerMoveTo({bottom: 200})
@@ -419,8 +419,8 @@ describe("bind layout behaviour", function () {
         })
       })
       describe("with a number", function () {
-        it("should bind the bottom of the view to the number multiplied by the height of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor the bottom of the view to the number multiplied by the height of the other view", function () {
+          view.anchorTo(otherView, {
             bottom: 0.2
           });
         
@@ -432,7 +432,7 @@ describe("bind layout behaviour", function () {
       });
       describe('with a function', function () {
         it ('should set the outer bottom position of the view to the value returned by the function', function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             bottom: function (other, oRect, oOuterRect) {
               return 6543;
             }
@@ -443,13 +443,13 @@ describe("bind layout behaviour", function () {
           expect(view.outerRect().bottom).toEqual(6543);
         });
         
-        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when bindingToOuterRect', function () {
+        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when anchoringToOuterRect', function () {
           var rect = {}
           var outerRect = {}
           spyOn(otherView, 'outerRect').andReturn(outerRect);
           spyOn(otherView, 'rect').andReturn(rect);
           
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             bottom: function (o, or, oor) {
               expect(o).toBe(otherView)
               expect(or).toBe(rect)
@@ -459,14 +459,14 @@ describe("bind layout behaviour", function () {
         })
       })
     });
-    describe("binding the left of the view", function () {
-      it ("should not throw an error if the left binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring the left of the view", function () {
+      it ("should not throw an error if the left anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.outerMoveTo({top: 123, left: 456});
       });
       describe("with true", function () {
-        it('should bind to the left of the otherView', function () {
-          view.bindTo(otherView, {
+        it('should anchor to the left of the otherView', function () {
+          view.anchorTo(otherView, {
             left: true
           });
         
@@ -476,8 +476,8 @@ describe("bind layout behaviour", function () {
         });
       });
       describe('with "left"', function(){
-        it ('should bind to the top of the other view', function () {
-          view.bindTo(otherView, {
+        it ('should anchor to the top of the other view', function () {
+          view.anchorTo(otherView, {
             left: 'left'
           });
         
@@ -487,8 +487,8 @@ describe("bind layout behaviour", function () {
         });
       })
       describe("with 'right'", function () {
-        it("should bind to the right of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor to the right of the other view", function () {
+          view.anchorTo(otherView, {
             left: 'right'
           });
           view.outerResize({width: 200, height: 300});
@@ -501,7 +501,7 @@ describe("bind layout behaviour", function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 left: "23"
               });
             }
@@ -509,22 +509,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 left: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             left: '+123'
           })
           otherView.moveTo({left: 200})
           expect(view.outerRect().left).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             left: '-46'
           })
           otherView.outerMoveTo({left: 200})
@@ -532,8 +532,8 @@ describe("bind layout behaviour", function () {
         })
       })
       describe("with a number", function () {
-        it("should bind the left of the view to the number multiplied by the width of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor the left of the view to the number multiplied by the width of the other view", function () {
+          view.anchorTo(otherView, {
             left: 0.2
           });
         
@@ -544,7 +544,7 @@ describe("bind layout behaviour", function () {
       });
       describe('with a function', function () {
         it ('should set the outer left position of the view to the value returned by the function', function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             left: function (other, oRect, oOuterRect) {
               return 5134;
             }
@@ -555,13 +555,13 @@ describe("bind layout behaviour", function () {
           expect(view.outerRect().left).toEqual(5134);
         });
         
-        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when bindingToOuterRect', function () {
+        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when anchoringToOuterRect', function () {
           var rect = {}
           var outerRect = {}
           spyOn(otherView, 'outerRect').andReturn(outerRect);
           spyOn(otherView, 'rect').andReturn(rect);
           
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             left: function (o, or, oor) {
               expect(o).toBe(otherView)
               expect(or).toBe(rect)
@@ -571,14 +571,14 @@ describe("bind layout behaviour", function () {
         })
       })
     }); 
-    describe("binding the right of the view", function () {
-      it ("should not throw an error if the right binding is undefined", function () {
-        view.bindTo(otherView, {});
+    describe("anchoring the right of the view", function () {
+      it ("should not throw an error if the right anchoring is undefined", function () {
+        view.anchorTo(otherView, {});
         otherView.outerMoveTo({top: 123, left: 456});
       });
       describe("with true", function () {
-        it('should bind to the right of the otherView', function () {
-          view.bindTo(otherView, {
+        it('should anchor to the right of the otherView', function () {
+          view.anchorTo(otherView, {
             right: true
           });
         
@@ -589,8 +589,8 @@ describe("bind layout behaviour", function () {
         });
       });
       describe('with "left"', function(){
-        it ('should bind the right edge of the view to the left edge of the other view', function () {
-          view.bindTo(otherView, {
+        it ('should anchor the right edge of the view to the left edge of the other view', function () {
+          view.anchorTo(otherView, {
             right: 'left'
           });
         
@@ -601,8 +601,8 @@ describe("bind layout behaviour", function () {
         });
       })
       describe("with 'right'", function () {
-        it("should bind to the right of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor to the right of the other view", function () {
+          view.anchorTo(otherView, {
             right: true
           });
         
@@ -616,7 +616,7 @@ describe("bind layout behaviour", function () {
         describe ('invalid offsets', function () {
           it('should throw an error if it does not start with +/-', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 right: "23"
               });
             }
@@ -624,22 +624,22 @@ describe("bind layout behaviour", function () {
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
-              view.bindTo(otherView, {
+              view.anchorTo(otherView, {
                 right: "+23meow"
               });
             }
             expect(fn).toThrowAnError();
           })
         })
-        it('should bind positive offsets correctly', function() {
-          view.bindTo(otherView, {
+        it('should anchor positive offsets correctly', function() {
+          view.anchorTo(otherView, {
             right: '+123'
           })
           otherView.moveTo({right: 200})
           expect(view.outerRect().right).toBe(323);
         })
-        it('should bind negative offsets correctly', function () {
-          view.bindTo(otherView, {
+        it('should anchor negative offsets correctly', function () {
+          view.anchorTo(otherView, {
             right: '-46'
           })
           otherView.outerMoveTo({right: 200})
@@ -647,8 +647,8 @@ describe("bind layout behaviour", function () {
         })
       })
       describe("with a number", function () {
-        it("should bind the right of the view to the number multiplied by the width of the other view", function () {
-          view.bindTo(otherView, {
+        it("should anchor the right of the view to the number multiplied by the width of the other view", function () {
+          view.anchorTo(otherView, {
             right: 0.6
           });
         
@@ -659,7 +659,7 @@ describe("bind layout behaviour", function () {
       });
       describe('with a function', function () {
         it ('should set the outer right position of the view to the value returned by the function', function () {
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             right: function (other, oRect, oOuterRect) {
               return 1024;
             }
@@ -671,13 +671,13 @@ describe("bind layout behaviour", function () {
           expect(view.outerRect().right).toEqual(1024);
         });
         
-        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when bindingToOuterRect', function () {
+        it('should pass the otherView, otherViewRect and otherViewOuterRect to the function when anchoringToOuterRect', function () {
           var rect = {}
           var outerRect = {}
           spyOn(otherView, 'outerRect').andReturn(outerRect);
           spyOn(otherView, 'rect').andReturn(rect);
           
-          view.bindTo(otherView, {
+          view.anchorTo(otherView, {
             right: function (o, or, oor) {
               expect(o).toBe(otherView)
               expect(or).toBe(rect)
@@ -688,8 +688,8 @@ describe("bind layout behaviour", function () {
       })
     });
     describe("when repositioning the otherView", function () {
-      it ("should effect the size bindings on the binding view", function () {
-        view.bindTo(otherView, {
+      it ("should effect the size anchorings on the anchoring view", function () {
+        view.anchorTo(otherView, {
           width: function () {
             return 9876;
           }
@@ -701,8 +701,8 @@ describe("bind layout behaviour", function () {
       })
     });
     describe("when resizing the otherView", function () {
-      it ("should effect the position bindings on the binding view", function () {
-        view.bindTo(otherView, {
+      it ("should effect the position anchorings on the anchoring view", function () {
+        view.anchorTo(otherView, {
           top: function () {
             return 9876;
           }
@@ -718,7 +718,7 @@ describe("bind layout behaviour", function () {
       it('should arrange the bound view centered between the two points', function () {
         otherView.outerResize({width: 400, height: 300});
         view.outerResize({width: 350, height: 110});
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           top: 0.2,
           bottom: 0.9
         })
@@ -735,7 +735,7 @@ describe("bind layout behaviour", function () {
       it('should arrange the bound view centered between the two points', function () {
         otherView.outerResize({width: 400, height: 300});
         view.outerResize({width: 150, height: 110});
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           left: 0.1,
           right: 0.8
         })
@@ -748,39 +748,39 @@ describe("bind layout behaviour", function () {
       })
     })
     
-    describe("binding to ancestors", function () {
-      it('should result in a binding with bindToOuterRect being false', function () {
+    describe("anchoring to ancestors", function () {
+      it('should result in a anchoring with anchorToOuterRect being false', function () {
         view.addTo(otherView);
-        view.bindToParent({});
-        expect(view.binding().bindToOuterRect).toBe(false);
+        view.anchorToParent({});
+        expect(view.anchoring().anchorToOuterRect).toBe(false);
       })
-      it('should result in a binding with bindToOuterRect being true if explicitly set', function () {
+      it('should result in a anchoring with anchorToOuterRect being true if explicitly set', function () {
         view.addTo(otherView);
-        view.bindToParent({
-          bindToOuterRect: true
+        view.anchorToParent({
+          anchorToOuterRect: true
         })
-        expect(view.binding().bindToOuterRect).toBe(true);
+        expect(view.anchoring().anchorToOuterRect).toBe(true);
       })
     })
     
-    describe("binding to non-ancestors", function () {
-      it('should result in a binding where bindToOuterRect is true', function () {
-        view.bindTo(otherView, {});
-        expect(view.binding().bindToOuterRect).toBe(true);
+    describe("anchoring to non-ancestors", function () {
+      it('should result in a anchoring where anchorToOuterRect is true', function () {
+        view.anchorTo(otherView, {});
+        expect(view.anchoring().anchorToOuterRect).toBe(true);
       })
     })
     
-    describe('binding with bindOuterRect', function () {
-      it('should bind the inner rectangle when false', function () {
+    describe('anchoring with anchorOuterRect', function () {
+      it('should anchor the inner rectangle when false', function () {
         otherView.z().css('borderWidth', 10);
         
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           top: true,
           left: true,
           width: true,
           height: true,
-          bindOuterRect: false,
-          bindToOuterRect: false
+          anchorOuterRect: false,
+          anchorToOuterRect: false
         });
         
         otherView.resize({width: 300, height: 250}).moveTo({left: 30, top: 50});
@@ -794,16 +794,16 @@ describe("bind layout behaviour", function () {
         expect(r.top).toBe(r2.top);
         expect(r.left).toBe(r2.left);
       })
-      it('should bind the outer rectangle when true', function () {
+      it('should anchor the outer rectangle when true', function () {
         otherView.z().css('borderWidth', 10);
         
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           top: true,
           left: true,
           width: true,
           height: true,
-          bindOuterRect: true,
-          bindToOuterRect: true
+          anchorOuterRect: true,
+          anchorToOuterRect: true
         });
         
         otherView.outerResize({width: 300, height: 250}).outerMoveTo({left: 30, top: 50});
@@ -818,21 +818,21 @@ describe("bind layout behaviour", function () {
         expect(r.left).toBe(r2.left);
       })
       it('should default to true', function () {
-        view.bindTo(otherView,{});
-        expect(view.binding().bindOuterRect).toBe(true);
+        view.anchorTo(otherView,{});
+        expect(view.anchoring().anchorOuterRect).toBe(true);
       })
     })
     
-    describe('binding with bindToOuterRect', function () {
-      it("should bind to the inner rect of otherView when false", function() {
+    describe('anchoring with anchorToOuterRect', function () {
+      it("should anchor to the inner rect of otherView when false", function() {
         otherView.z().css('borderWidth', 10);
         
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           top: true,
           left: true,
           width: true,
           height: true,
-          bindToOuterRect: false
+          anchorToOuterRect: false
         });
         
         otherView.resize({width: 300, height: 250}).outerMoveTo({left: 30, top: 50});
@@ -847,15 +847,15 @@ describe("bind layout behaviour", function () {
         expect(r.left).toBe(r2.left);
       });
 
-      it("should bind to outerRect of otherView when true", function() {
+      it("should anchor to outerRect of otherView when true", function() {
         otherView.z().css('borderWidth', 10);
 
-        view.bindTo(otherView, {
+        view.anchorTo(otherView, {
           top: true,
           left: true,
           width: true,
           height: true,
-          bindToOuterRect: true
+          anchorToOuterRect: true
         });
 
         otherView.outerResize({width: 300, height: 250}).outerMoveTo({left: 30, top: 50});
@@ -871,85 +871,85 @@ describe("bind layout behaviour", function () {
       });
 
       it("should default to true", function() {
-        view.bindTo(otherView, {      });
-        var b = view.binding();
-        expect(b.bindToOuterRect).toBe(true);
+        view.anchorTo(otherView, {      });
+        var b = view.anchoring();
+        expect(b.anchorToOuterRect).toBe(true);
       });
     })
     
   });
 
-  describe("binding()", function () {
+  describe("anchoring()", function () {
     it("should return null when the view is not bound", function () {
-      expect(view.binding()).toBeNull();
+      expect(view.anchoring()).toBeNull();
     })
-    it('should return the binding with the otherView', function () {
-      var binding = {};
-      view.bindTo(otherView, binding);
-      var r = view.binding();
+    it('should return the anchoring with the otherView', function () {
+      var anchoring = {};
+      view.anchorTo(otherView, anchoring);
+      var r = view.anchoring();
       
       expect(r.otherView).toBe(otherView);
-      expect(r).toBe(binding);
+      expect(r).toBe(anchoring);
     })
   })
 
-  describe("unbind()", function () {
+  describe("deanchor()", function () {
     it('should be chainable', function () {
       var v = new View1;
-      expect(v.unbind()).toBe(v);
+      expect(v.deanchor()).toBe(v);
     })
     it('should be inneffectual if there is no bound view', function () {
-      expect(view.unbind().binding()).toBeNull();
+      expect(view.deanchor().anchoring()).toBeNull();
     })
     
     it('should remove event listeners from the otherView', function () {
 
-      view.bindTo(otherView, {
+      view.anchorTo(otherView, {
         left: function () { return 480; },
         width: function () { return 313; }
       });
       
-      view.unbind();
+      view.deanchor();
       
       expect(otherView.onResized().listeners().length).toEqual(0);
       expect(otherView.onMoved().listeners().length).toEqual(0);
     })
     
-    it('should result in subsequent calls to binding() returning null', function () {
-      view.bindTo(otherView, {});
-      view.unbind();
-      expect(view.binding()).toBeNull();
+    it('should result in subsequent calls to anchoring() returning null', function () {
+      view.anchorTo(otherView, {});
+      view.deanchor();
+      expect(view.anchoring()).toBeNull();
     })
   });
   
-  describe('bindToParent()', function () {
-    it('should call bindTo with the parent of the view', function () {
+  describe('anchorToParent()', function () {
+    it('should call anchorTo with the parent of the view', function () {
       view.addTo(otherView);
-      spyOn(view, 'bindTo');
-      var binding = {};
-      view.bindToParent(binding);
-      expect(view.bindTo).toHaveBeenCalled();
+      spyOn(view, 'anchorTo');
+      var anchoring = {};
+      view.anchorToParent(anchoring);
+      expect(view.anchorTo).toHaveBeenCalled();
     });
     it('should be chainable', function () {
       view.addTo(otherView);
       
-      expect(view.bindToParent({})).toBe(view);
+      expect(view.anchorToParent({})).toBe(view);
     });
-    it("should not bind do nothing when called on a root view", function() {
+    it("should not anchor do nothing when called on a root view", function() {
       var v = new Superview
       
-      v.bindToParent();
+      v.anchorToParent();
       
-      expect(v.binding()).toBeNull();
+      expect(v.anchoring()).toBeNull();
     });
   })
 
   describe('when otherView is removed', function () {
-    it('should unbind from the view', function () {
-      spyOn(view, 'unbind');
-      view.bindTo(otherView, {});
+    it('should deanchor from the view', function () {
+      spyOn(view, 'deanchor');
+      view.anchorTo(otherView, {});
       otherView.remove();
-      expect(view.unbind).toHaveBeenCalled();
+      expect(view.deanchor).toHaveBeenCalled();
     })
   })
 });

@@ -36,7 +36,7 @@ describe('superview.window', function () {
     beforeEach(function () {
       w.install()
     })
-    it('should bind the outer dimension of body to the window size', function () {
+    it('should anchor the outer dimension of body to the window size', function () {
       expect(w.z().outerWidth()).toBe($(window).width());
       expect(w.z().outerHeight()).toBe($(window).height());
     })

@@ -1,12 +1,16 @@
+/ 1: rename z() to $() call anchorTo anchorTo()
+
+/2: replace parseInt|Float() with parseFloat(..., 10)
+/3: if I bind a box to the right of something and then resize it, it should still stick to the right
+        > visual spec
+        > spec
+/4: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
+        > visual spec
+        > spec
+
+/5: stop dragging on window lost focus
+/6: checkout fractional layouts
+
+
 / next: Supermodel
-
-
-/ 3: views might have a relativePath() and path() for hashbangs. Page should return '/'.
-    > make Page appear to be the root view when it is used? 
-    > otherwise what's best to do here, also what's fastest ;)
-    // if make masquerades as the root view then parent() should return null, but _parent should still be the window
-      // ^^^ would this get ugly?
-    // return vid as path by default
-    // probably need an activate[d] event/function
-    // Explore html5 viewstate
   

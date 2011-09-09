@@ -1,18 +1,18 @@
 <script type="text/javascript" charset="utf-8">
   
-  var BindToSibling = function () {
+  var AnchorToSibling = function () {
     extend(this).mixin(Superview.Page);
   }
   
-  BindToSibling.prototype = {
+  AnchorToSibling.prototype = {
     render: function () {
       var container = new Superview().render().addTo(this);
       container.z().css({
         backgroundColor: '#3020FF'
       });
-      container.bind = function () {
+      container.anchor = function () {
         var self = this;
-        this.bindToParent({
+        this.anchorToParent({
           width: function (parent) {
             return parent.rect().width - 30
           },
@@ -40,8 +40,8 @@
       box2.z().css({
         backgroundColor: 'pink'
       })
-      box2.bind = function () {
-        this.bindTo(box, {
+      box2.anchor = function () {
+        this.anchorTo(box, {
           top: true,
           left: 'right',
           width: true,
@@ -51,15 +51,16 @@
       
       // for positional testing
       window.yellowBox = box;
+      window.pinkBox = box2;
       this._box = box;
       return this
     },
-    bind: function () {
+    anchor: function () {
       return this.fitWindow();
     }
   }
   
   jQuery(function () {
-    new BindToSibling().initialize();
+    new AnchorToSibling().initialize();
   })
 </script>

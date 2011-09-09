@@ -14,11 +14,11 @@
     this.onResized().throttle(10);
     this.onMoved().throttle(10);
     
-    extend(this).with({
+    extend(this).withObject({
       hasViewMixin: true,
       _controller: null,
       _parent: null,
-      _binding: null,
+      _anchoring: null,
       _subviews: {},
       _vid: Superview.vidSpool++,
       _zElem: z.div().css({
@@ -319,47 +319,47 @@
       return r;
     },
     
-    bindTo: function (otherView, binding) {
+    anchorTo: function (otherView, anchoring) {
       var self = this;
       
-      if (self.binding()) self.unbind();
+      if (self.anchoring()) self.deanchor();
       
-      self._binding = binding;
-      extend(binding).with({
+      self._anchoring = anchoring;
+      extend(anchoring).withObject({
         otherView: otherView,
-        bindToOuterRect: !self.ancestors().contains(otherView),
-        bindOuterRect: true
+        anchorToOuterRect: !self.ancestors().contains(otherView),
+        anchorOuterRect: true
       });
       
-      self._bindingResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
-        var binding = self._binding;
-        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
-        var boundRect = binding.bindOuterRect ? self.outerRect() : self.rect();
-        var resize = binding.bindOuterRect ? self.outerResize : self.resize;
+      self._anchoringResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var anchoring = self._anchoring;
+        var anchorToRect = anchoring.anchorToOuterRect ? otherViewOuterRect : otherViewRect;
+        var boundRect = anchoring.anchorOuterRect ? self.outerRect() : self.rect();
+        var resize = anchoring.anchorOuterRect ? self.outerResize : self.resize;
         
         function handleSize (dimension) {
-          switch (typeof binding[dimension]) {
+          switch (typeof anchoring[dimension]) {
             case 'undefined':
               break;
             case 'boolean':
-              if (binding[dimension]) {
-                boundRect[dimension] = bindToRect[dimension];
+              if (anchoring[dimension]) {
+                boundRect[dimension] = anchorToRect[dimension];
               }
               break;
             case 'number':
-              boundRect[dimension] = bindToRect[dimension] * binding[dimension];
+              boundRect[dimension] = anchorToRect[dimension] * anchoring[dimension];
               break;
             case 'function':
-              boundRect[dimension] = binding[dimension](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[dimension] = anchoring[dimension](otherView, otherViewRect, otherViewOuterRect);
               break;
             case 'string':
-              var expr = binding[dimension];
+              var expr = anchoring[dimension];
               if (expr.match(/^[\+-]\d+$/)) {
-                boundRect[dimension] = eval(bindToRect[dimension]+expr);
+                boundRect[dimension] = eval(anchorToRect[dimension]+expr);
                 break;
               }
             default:
-              throw new Error("Invalid binding for "+dimension+": " + binding[dimension]);
+              throw new Error("Invalid anchoring for "+dimension+": " + anchoring[dimension]);
           }
         }
         
@@ -368,50 +368,50 @@
         resize.call(self, boundRect);
       }
       
-      self._bindingMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
-        var binding = self._binding;
-        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
-        var moveTo = binding.bindOuterRect ? self.outerMoveTo : self.moveTo;
+      self._anchoringMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var anchoring = self._anchoring;
+        var anchorToRect = anchoring.anchorToOuterRect ? otherViewOuterRect : otherViewRect;
+        var moveTo = anchoring.anchorOuterRect ? self.outerMoveTo : self.moveTo;
         var boundRect = {};
         
         function handlePosition (position, dimension, opposite) {
-          switch (typeof binding[position]) {
+          switch (typeof anchoring[position]) {
             case 'undefined':
               break;
             case 'boolean':
-              if (binding[position]) {
-                boundRect[position] = bindToRect[position];
+              if (anchoring[position]) {
+                boundRect[position] = anchorToRect[position];
               }
               break;
             case 'number':
-              boundRect[position] = bindToRect[dimension] * binding[position];
+              boundRect[position] = anchorToRect[dimension] * anchoring[position];
               break;
             case 'string':
               // check if it is an offset expression
-              var expr = binding[position];
+              var expr = anchoring[position];
               if (expr.match(/^[\+-]\d+$/)) {
-                boundRect[position] = eval(bindToRect[position]+expr);
+                boundRect[position] = eval(anchorToRect[position]+expr);
                 break;
               }
               
               // otherwise maybe it is 'top'/'bottom' or 'left'/'right'
               var stringHandled = true;
-              switch (binding[position]) {
+              switch (anchoring[position]) {
                 case position:
-                  boundRect[position] = bindToRect[position];
+                  boundRect[position] = anchorToRect[position];
                   break;
                 case opposite:
-                  boundRect[position] = bindToRect[opposite];
+                  boundRect[position] = anchorToRect[opposite];
                   break;
                 default:
                   stringHandled = false;
               }
               if (stringHandled) break;
             case 'function':
-              boundRect[position] = binding[position](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[position] = anchoring[position](otherView, otherViewRect, otherViewOuterRect);
               break;
             default:
-              throw new Error("Invalid binding for " + position + ": " + binding[position]);
+              throw new Error("Invalid anchoring for " + position + ": " + anchoring[position]);
           }
         }
         
@@ -421,13 +421,13 @@
         handlePosition('right', 'width', 'left');
         
         if (typeof boundRect.top === 'number' && typeof boundRect.bottom === 'number') {
-          var halfHeight = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).height / 2;
+          var halfHeight = (anchoring.anchorOuterRect ? self.outerRect : self.rect).call(self).height / 2;
           boundRect.top = boundRect.top + ((boundRect.bottom - boundRect.top) / 2) - halfHeight;
           delete boundRect.bottom;
         }
 
         if (typeof boundRect.left === 'number' && typeof boundRect.right === 'number') {
-          var halfWidth = (binding.bindOuterRect ? self.outerRect : self.rect).call(self).width / 2;
+          var halfWidth = (anchoring.anchorOuterRect ? self.outerRect : self.rect).call(self).width / 2;
           boundRect.left = boundRect.left + ((boundRect.right - boundRect.left) / 2) - halfWidth;
           delete boundRect.right;
         }
@@ -435,38 +435,38 @@
         moveTo.call(self, boundRect);
       };
       
-      otherView.onResized(self._bindingResizeHandler);
-      otherView.onResized(self._bindingMoveHandler);
-      otherView.onMoved(self._bindingResizeHandler);
-      otherView.onMoved(self._bindingMoveHandler);
+      otherView.onResized(self._anchoringResizeHandler);
+      otherView.onResized(self._anchoringMoveHandler);
+      otherView.onMoved(self._anchoringResizeHandler);
+      otherView.onMoved(self._anchoringMoveHandler);
       otherView.onRemoved(function () {
-        self.unbind();
+        self.deanchor();
       });
       
       // set the initial state by
-      self._bindingResizeHandler(otherView, otherView.rect(), otherView.outerRect());
-      self._bindingMoveHandler(otherView, otherView.rect(), otherView.outerRect());
+      self._anchoringResizeHandler(otherView, otherView.rect(), otherView.outerRect());
+      self._anchoringMoveHandler(otherView, otherView.rect(), otherView.outerRect());
 
       return this;
     },
-    bindToParent: function (binding) {
-      return this.isRoot() ? this : this.bindTo(this.parent(), binding);
+    anchorToParent: function (anchoring) {
+      return this.isRoot() ? this : this.anchorTo(this.parent(), anchoring);
     },
-    binding: function () {
-      return this._binding;
+    anchoring: function () {
+      return this._anchoring;
     },
-    unbind: function () {
+    deanchor: function () {
       
       var self = this;
-      var binding = this.binding();
+      var anchoring = this.anchoring();
       
-      if (binding) {
-        binding.otherView.onResized().unbind(self._bindingMoveHandler);
-        binding.otherView.onResized().unbind(self._bindingResizeHandler);
-        binding.otherView.onMoved().unbind(self._bindingMoveHandler);
-        binding.otherView.onMoved().unbind(self._bindingResizeHandler);
+      if (anchoring) {
+        anchoring.otherView.onResized().unbind(self._anchoringMoveHandler);
+        anchoring.otherView.onResized().unbind(self._anchoringResizeHandler);
+        anchoring.otherView.onMoved().unbind(self._anchoringMoveHandler);
+        anchoring.otherView.onMoved().unbind(self._anchoringResizeHandler);
         
-        this._binding = null;
+        this._anchoring = null;
       }
       
       return this;
@@ -476,7 +476,7 @@
       var vs = this.subviews(true);
       vs.unshift(this);
       vs.forEach(function (view) {
-        view.bind()
+        view.anchor()
         view.populate()
       });
       return this;
@@ -485,7 +485,7 @@
       // NOOP default. override me!
       return this
     },
-    bind: function () {
+    anchor: function () {
       // NOOP. Override me!
       return this;
     },
@@ -498,7 +498,7 @@
     },
     
     /*
-      unbind listeners and nullify local variable
+      deanchor listeners and nullify local variable
       edging when resizable
     */
     draggable: function () {
@@ -525,7 +525,7 @@
                 
         w.bind('mousemove', moveHandler);
         w.one('mouseup', function () {
-          w.unbind('mousemove', moveHandler);
+          w.deanchor('mousemove', moveHandler);
         });
       })
     }

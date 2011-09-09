@@ -25,7 +25,7 @@ var KeyCodes = {
       hasViewMixin: true,
       _controller: null,
       _parent: null,
-      _binding: null,
+      _anchoring: null,
       _subviews: {},
       _vid: Superview.vidSpool++,
       _zElem: z.div().css({
@@ -326,47 +326,47 @@ var KeyCodes = {
       return r;
     },
     
-    bindTo: function (otherView, binding) {
+    anchorTo: function (otherView, anchoring) {
       var self = this;
       
-      if (self.binding()) self.unbind();
+      if (self.anchoring()) self.deanchor();
       
-      self._binding = binding;
-      extend(binding).with({
+      self._anchoring = anchoring;
+      extend(anchoring).with({
         otherView: otherView,
-        bindToOuterRect: !self.ancestors().contains(otherView),
+        anchorToOuterRect: !self.ancestors().contains(otherView),
         bindOuterRect: true
       });
       
-      self._bindingResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
-        var binding = self._binding;
-        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
-        var boundRect = binding.bindOuterRect ? self.outerRect() : self.rect();
-        var resize = binding.bindOuterRect ? self.outerResize : self.resize;
+      self._anchoringResizeHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var anchoring = self._anchoring;
+        var anchorToRect = anchoring.anchorToOuterRect ? otherViewOuterRect : otherViewRect;
+        var boundRect = anchoring.bindOuterRect ? self.outerRect() : self.rect();
+        var resize = anchoring.bindOuterRect ? self.outerResize : self.resize;
         
         function handleSize (dimension) {
-          switch (typeof binding[dimension]) {
+          switch (typeof anchoring[dimension]) {
             case 'undefined':
               break;
             case 'boolean':
-              if (binding[dimension]) {
-                boundRect[dimension] = bindToRect[dimension];
+              if (anchoring[dimension]) {
+                boundRect[dimension] = anchorToRect[dimension];
               }
               break;
             case 'number':
-              boundRect[dimension] = bindToRect[dimension] * binding[dimension];
+              boundRect[dimension] = anchorToRect[dimension] * anchoring[dimension];
               break;
             case 'function':
-              boundRect[dimension] = binding[dimension](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[dimension] = anchoring[dimension](otherView, otherViewRect, otherViewOuterRect);
               break;
             case 'string':
-              var expr = binding[dimension];
+              var expr = anchoring[dimension];
               if (expr.match(/^[\+-]\d+$/)) {
-                boundRect[dimension] = eval(bindToRect[dimension]+expr);
+                boundRect[dimension] = eval(anchorToRect[dimension]+expr);
                 break;
               }
             default:
-              throw new Error("Invalid binding for "+dimension+": " + binding[dimension]);
+              throw new Error("Invalid anchoring for "+dimension+": " + anchoring[dimension]);
           }
         }
         
@@ -375,42 +375,42 @@ var KeyCodes = {
         resize.call(self, boundRect);
       }
       
-      self._bindingMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
-        var binding = self._binding;
-        var bindToRect = binding.bindToOuterRect ? otherViewOuterRect : otherViewRect;
-        var moveTo = binding.bindOuterRect ? self.outerMoveTo : self.moveTo;
+      self._anchoringMoveHandler = function (otherView, otherViewRect, otherViewOuterRect) {
+        var anchoring = self._anchoring;
+        var anchorToRect = anchoring.anchorToOuterRect ? otherViewOuterRect : otherViewRect;
+        var moveTo = anchoring.bindOuterRect ? self.outerMoveTo : self.moveTo;
         var boundRect = {};
         
         function handlePosition (position, dimension, opposite) {
-          switch (typeof binding[position]) {
+          switch (typeof anchoring[position]) {
             case 'undefined':
               break;
             case 'boolean':
-              if (binding[position]) {
-                boundRect[position] = bindToRect[position];
+              if (anchoring[position]) {
+                boundRect[position] = anchorToRect[position];
               }
               break;
             case 'number':
-              boundRect[position] = bindToRect[dimension] * binding[position];
+              boundRect[position] = anchorToRect[dimension] * anchoring[position];
               break;
             case 'string':
               var stringHandled = true;
-              switch (binding[position]) {
+              switch (anchoring[position]) {
                 case position:
-                  boundRect[position] = bindToRect[position];
+                  boundRect[position] = anchorToRect[position];
                   break;
                 case opposite:
-                  boundRect[position] = bindToRect[opposite];
+                  boundRect[position] = anchorToRect[opposite];
                   break;
                 default:
                   stringHandled = false;
               }
               if (stringHandled) break;
             case 'function':
-              boundRect[position] = binding[position](otherView, otherViewRect, otherViewOuterRect);
+              boundRect[position] = anchoring[position](otherView, otherViewRect, otherViewOuterRect);
               break;
             default:
-              throw new Error("Invalid binding for " + position + ": " + binding[position]);
+              throw new Error("Invalid anchoring for " + position + ": " + anchoring[position]);
           }
         }
         
@@ -422,38 +422,38 @@ var KeyCodes = {
         moveTo.call(self, boundRect);
       };
       
-      otherView.onResized(self._bindingResizeHandler);
-      otherView.onResized(self._bindingMoveHandler);
-      otherView.onMoved(self._bindingResizeHandler);
-      otherView.onMoved(self._bindingMoveHandler);
+      otherView.onResized(self._anchoringResizeHandler);
+      otherView.onResized(self._anchoringMoveHandler);
+      otherView.onMoved(self._anchoringResizeHandler);
+      otherView.onMoved(self._anchoringMoveHandler);
       otherView.onRemoved(function () {
-        self.unbind();
+        self.deanchor();
       });
       
       // set the initial state by
-      self._bindingResizeHandler(otherView, otherView.rect(), otherView.outerRect());
-      self._bindingMoveHandler(otherView, otherView.rect(), otherView.outerRect());
+      self._anchoringResizeHandler(otherView, otherView.rect(), otherView.outerRect());
+      self._anchoringMoveHandler(otherView, otherView.rect(), otherView.outerRect());
 
       return this;
     },
-    bindToParent: function (binding) {
-      return this.isRoot() ? this : this.bindTo(this.parent(), binding);
+    anchorToParent: function (anchoring) {
+      return this.isRoot() ? this : this.anchorTo(this.parent(), anchoring);
     },
-    binding: function () {
-      return this._binding;
+    anchoring: function () {
+      return this._anchoring;
     },
-    unbind: function () {
+    deanchor: function () {
       
       var self = this;
-      var binding = this.binding();
+      var anchoring = this.anchoring();
       
-      if (binding) {
-        binding.otherView.onResized().unbind(self._bindingMoveHandler);
-        binding.otherView.onResized().unbind(self._bindingResizeHandler);
-        binding.otherView.onMoved().unbind(self._bindingMoveHandler);
-        binding.otherView.onMoved().unbind(self._bindingResizeHandler);
+      if (anchoring) {
+        anchoring.otherView.onResized().deanchor(self._anchoringMoveHandler);
+        anchoring.otherView.onResized().deanchor(self._anchoringResizeHandler);
+        anchoring.otherView.onMoved().deanchor(self._anchoringMoveHandler);
+        anchoring.otherView.onMoved().deanchor(self._anchoringResizeHandler);
         
-        this._binding = null;
+        this._anchoring = null;
       }
       
       return this;
@@ -485,7 +485,7 @@ var KeyCodes = {
     },
     
     /*
-      unbind listeners and nullify local variable
+      deanchor listeners and nullify local variable
       edging when resizable
     */
     draggable: function () {
@@ -512,7 +512,7 @@ var KeyCodes = {
                 
         w.bind('mousemove', moveHandler);
         w.one('mouseup', function () {
-          w.unbind('mousemove', moveHandler);
+          w.deanchor('mousemove', moveHandler);
         });
       })
     }
@@ -539,7 +539,7 @@ Superview.Page = (function () {
       return this;
     },
     fitWindow: function () {
-      return this.bindTo(Superview.Window, {
+      return this.anchorTo(Superview.Window, {
         width: true,
         height: true
       });
@@ -658,7 +658,7 @@ Superview.Window = (function () {
         overflow: 'scroll'
       });
       Window.z().detach();
-      z.window().unbind('resize', fitToWindow);
+      z.window().deanchor('resize', fitToWindow);
     }
   });
   

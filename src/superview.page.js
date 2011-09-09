@@ -14,7 +14,7 @@ Superview.Page = (function () {
       return this;
     },
     fitWindow: function () {
-      return this.bindTo(Superview.Window, {
+      return this.anchorTo(Superview.Window, {
         width: true,
         height: true
       });

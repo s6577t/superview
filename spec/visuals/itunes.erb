@@ -11,28 +11,28 @@
           main = new Superview
       
       list.outerResize({
-        width: 100
+        width: 180
       }).z().css({
         backgroundColor: '#80FFB3'
       })
       
-      list.bind = function () {
-        this.bindToParent({
+      list.anchor = function () {
+        this.anchorToParent({
           left: true,
           top: true,
-          height: '-100'
+          height: '-180'
         })
       }
       
       box.outerResize({
-        width: 100,
-        height: 100
+        width: 180,
+        height: 180
       }).z().css({
         backgroundColor: '#A040FF'
       })
       
-      box.bind = function () {
-        this.bindToParent({
+      box.anchor = function () {
+        this.anchorToParent({
           bottom: true,
           left: true
         })
@@ -42,19 +42,19 @@
         backgroundColor: '#FF6060'
       })
       
-      main.bind = function () {
-        this.bindToParent({
+      main.anchor = function () {
+        this.anchorToParent({
           top: true,
           right: true,
           height: true,
-          width: '-100'
+          width: '-180'
         })
       }
       
       this.add(list, box, main);      
       return this
     },
-    bind: function () {
+    anchor: function () {
       return this.fitWindow();
     }
   }
