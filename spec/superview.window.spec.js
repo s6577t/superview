@@ -1,4 +1,4 @@
-describe('superview.window', function () {
+xdescribe('superview.window', function () {
   var w;
   beforeEach(function() {
     w = Superview.Window;

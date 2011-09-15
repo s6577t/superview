@@ -1,15 +1,35 @@
+1: size and position bounds and callbacks
+1b: outerMoveTo() -> moveTo() no more outerMoveTo
+1c: remove padding and paddingMetrics. padding should not be necessary with this layout system
+resize({width:, height:}, {includeBorder: true});
 
-/2: replace parseInt|Float() with parseFloat(..., 10)
-/3: if I bind a box to the right of something and then resize it, it should still stick to the right
+CSS_FILTER:
+-> faux pas: margin, border, padding, position, dimension, max-dimension, min-dimensions
+
+2: padding and border css intercepts -> trigger event
+3: refactor anchoring and fix fractional positioning bug (if it exists?)
+4: detect and refuse cyclic anchoring
+5: ancestor anchoring behaviour revision
+6: anchorBoundsTo handling
+7: fix draggable with padding/border bug
+
+>: if I bind a box to the right of something and then resize it, it should still stick to the right
         > visual spec
         > spec
-/4: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
+>: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
         > visual spec
         > spec
 
-/5: stop dragging on window lost focus
-/6: checkout fractional layouts
+>: dragging with a border sent the position F**king crazy
 
+>: raise an error if there are cyclic anchorings
 
-/ next: Supermodel
+>: setting paddings and borders causes a resize .css({}) intercept border/padding changes
+
+>: RETEST visual and spec: fractional layouts anchorTo(..., {left: 0.5})
+
+>: bounds (max/min inner/outer Top|Left|Right|Bottom|Width|Height) should be anchorable too! bounds() and anchorBoundsTo()
+
+>: run tests and view visuals in Safari and Firefox and on the iPad
+
   

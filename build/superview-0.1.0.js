@@ -55,7 +55,7 @@ var KeyCodes = {
     elem: function () { 
       return this._zElem.elem(); 
     },
-    z: function () { 
+    $: function () { 
       return this._zElem; 
     },
     /*
@@ -65,7 +65,7 @@ var KeyCodes = {
       var subviewsToAdd = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
       subviewsToAdd.forEach(function (view) {
-        self.z().append(view.elem());
+        self.$().append(view.elem());
         self._subviews[view.vid()] = view;
         view._parent = self;
         // emit an event for listeners
@@ -125,7 +125,7 @@ var KeyCodes = {
         return self;
       }
       
-      this.z().remove();
+      this.$().remove();
       
       var parent = this._parent;
       
@@ -159,12 +159,12 @@ var KeyCodes = {
     // rectangle related functionality
     borderMetrics: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var m = {
-        top:    parseFloat(z.css('borderTopWidth')) || 0 ,
-        right:  parseFloat(z.css('borderRightWidth')) || 0,
-        bottom: parseFloat(z.css('borderBottomWidth')) || 0,
-        left:   parseFloat(z.css('borderLeftWidth')) || 0
+        top:    parseFloat(z.css('borderTopWidth'), 10) || 0 ,
+        right:  parseFloat(z.css('borderRightWidth'), 10) || 0,
+        bottom: parseFloat(z.css('borderBottomWidth'), 10) || 0,
+        left:   parseFloat(z.css('borderLeftWidth'), 10) || 0
       }
       
       m.width = m.right + m.left;
@@ -174,13 +174,13 @@ var KeyCodes = {
     },
     paddingMetrics: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       
       var m = {
-        top:    parseFloat(z.css('paddingTop')) || 0 ,
-        right:  parseFloat(z.css('paddingRight')) || 0,
-        bottom: parseFloat(z.css('paddingBottom')) || 0,
-        left:   parseFloat(z.css('paddingLeft')) || 0
+        top:    parseFloat(z.css('paddingTop'), 10) || 0 ,
+        right:  parseFloat(z.css('paddingRight'), 10) || 0,
+        bottom: parseFloat(z.css('paddingBottom'), 10) || 0,
+        left:   parseFloat(z.css('paddingLeft'), 10) || 0
       }
       
       m.width = m.right + m.left;
@@ -191,7 +191,7 @@ var KeyCodes = {
     
     resize: function (s) {
       var resized = false;
-      var z = this.z();
+      var z = this.$();
       var r = this.rect();
       
       if (Superview.Rect.hasWidth(s) && s.width != r.width) {
@@ -213,7 +213,7 @@ var KeyCodes = {
       return this;
     },
     outerResize: function (s) {
-      var z = this.z();
+      var z = this.$();
       
       if (Superview.Rect.hasWidth(s)) {
         s.width = s.width - (this.paddingMetrics().width + this.borderMetrics().width);
@@ -228,7 +228,7 @@ var KeyCodes = {
     
     moveTo: function (p) {
       var moved = false;
-      var z = this.z();
+      var z = this.$();
       var r = this.rect();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
@@ -260,7 +260,7 @@ var KeyCodes = {
       return this;
     },
     outerMoveTo: function (p) {
-      var z = this.z();
+      var z = this.$();
       var paddingMetrics = this.paddingMetrics();
       var borderMetrics = this.borderMetrics();
       
@@ -287,10 +287,10 @@ var KeyCodes = {
     
     rect: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var p = {
-        left: parseFloat(z.css('left')),
-        top: parseFloat(z.css('top'))
+        left: parseFloat(z.css('left'), 10),
+        top: parseFloat(z.css('top'), 10)
       };
   
       var r = {
@@ -307,10 +307,10 @@ var KeyCodes = {
     },
     outerRect: function () {
       var self = this;
-      var z = this.z();
+      var z = this.$();
       var p = {
-        left: parseFloat(z.css('left')),
-        top: parseFloat(z.css('top'))
+        left: parseFloat(z.css('left'), 10),
+        top: parseFloat(z.css('top'), 10)
       };
       
       var r = {
@@ -442,8 +442,14 @@ var KeyCodes = {
         moveTo.call(self, boundRect);
       };
       
+      self._anchoringSelfResizeHandler = function (me, rect, outerRect) {
+        self._anchoringMoveHandler(otherView, otherView.rect(), otherView.outerRect());
+      }
+      
       otherView.onResized(self._anchoringResizeHandler);
       otherView.onResized(self._anchoringMoveHandler);
+      self.onResized(self._anchoringSelfResizeHandler);
+      
       otherView.onMoved(self._anchoringResizeHandler);
       otherView.onMoved(self._anchoringMoveHandler);
       otherView.onRemoved(function () {
@@ -467,11 +473,17 @@ var KeyCodes = {
       var self = this;
       var anchoring = this.anchoring();
       
+      self.onResized().unbind(self._anchoringSelfResizeHandler);
+      delete self._anchoringSelfResizeHandler;
+      
       if (anchoring) {
-        anchoring.otherView.onResized().deanchor(self._anchoringMoveHandler);
-        anchoring.otherView.onResized().deanchor(self._anchoringResizeHandler);
-        anchoring.otherView.onMoved().deanchor(self._anchoringMoveHandler);
-        anchoring.otherView.onMoved().deanchor(self._anchoringResizeHandler);
+        anchoring.otherView.onResized().unbind(self._anchoringMoveHandler);
+        anchoring.otherView.onResized().unbind(self._anchoringResizeHandler);
+        anchoring.otherView.onMoved().unbind(self._anchoringMoveHandler);
+        anchoring.otherView.onMoved().unbind(self._anchoringResizeHandler);
+        
+        delete self._anchoringResizeHandler;
+        delete self._anchoringMoveHandler;
         
         this._anchoring = null;
       }
@@ -492,7 +504,7 @@ var KeyCodes = {
       // NOOP default. override me!
       return this
     },
-    bind: function () {
+    anchor: function () {
       // NOOP. Override me!
       return this;
     },
@@ -510,7 +522,7 @@ var KeyCodes = {
     */
     draggable: function () {
       
-      var self = this, thiz = this.z(), w = z.window();
+      var self = this, thiz = this.$(), w = z.window();
       
       // for smoother dragging action
       self.onMoved().throttle(5);
@@ -532,7 +544,7 @@ var KeyCodes = {
                 
         w.bind('mousemove', moveHandler);
         w.one('mouseup', function () {
-          w.deanchor('mousemove', moveHandler);
+          w.unbind('mousemove', moveHandler);
         });
       })
     }
@@ -552,7 +564,7 @@ Superview.Page = (function () {
   Page.prototype = {
     initialize: function () {
       Superview.Window.install();
-      this.z().addClass('page');
+      this.$().addClass('page');
       this.addTo(Superview.Window);
       this.render();
       this.parent().initialize();
@@ -663,7 +675,7 @@ Superview.Window = (function () {
         overflow: 'hidden'
       });
       
-      Window.z().addClass('window').appendTo(body);
+      Window.$().addClass('window').appendTo(body);
       
       fitToWindow();
       w.resize(fitToWindow);
@@ -677,8 +689,8 @@ Superview.Window = (function () {
         height: '100%',
         overflow: 'scroll'
       });
-      Window.z().detach();
-      z.window().deanchor('resize', fitToWindow);
+      Window.$().detach();
+      z.window().unbind('resize', fitToWindow);
     }
   });
   

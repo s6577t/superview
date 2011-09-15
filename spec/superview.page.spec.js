@@ -1,4 +1,4 @@
-describe('superview.page', function () {
+xdescribe('superview.page', function () {
   var pg;
   beforeEach(function () {
     pg = new Superview.Page().initialize();

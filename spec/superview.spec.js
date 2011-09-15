@@ -49,9 +49,9 @@ describe('superview', function () {
         callOrder.push(this);
       }
       
-      a.anchor = f;
-      b.anchor = f;
-      c.anchor = f;
+      a.bind= f;
+      b.bind= f;
+      c.bind= f;
       
       a.populate = f;
       b.populate = f;

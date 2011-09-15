@@ -10,7 +10,7 @@
       container.$().css({
         backgroundColor: '#3020FF'
       });
-      container.anchor = function () {
+      container.bind= function () {
         var self = this;
         this.anchorToParent({
           width: function (parent) {
@@ -40,7 +40,7 @@
       box2.$().css({
         backgroundColor: 'pink'
       })
-      box2.anchor = function () {
+      box2.bind= function () {
         this.anchorTo(box, {
           top: true,
           left: 'right',
@@ -55,7 +55,7 @@
       this._box = box;
       return this
     },
-    anchor: function () {
+    bind: function () {
       return this.fitWindow();
     }
   }

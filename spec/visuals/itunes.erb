@@ -16,7 +16,7 @@
         backgroundColor: '#80FFB3'
       })
       
-      list.anchor = function () {
+      list.bind= function () {
         this.anchorToParent({
           left: true,
           top: true,
@@ -31,7 +31,7 @@
         backgroundColor: '#A040FF'
       })
       
-      box.anchor = function () {
+      box.bind= function () {
         this.anchorToParent({
           bottom: true,
           left: true
@@ -42,7 +42,7 @@
         backgroundColor: '#FF6060'
       })
       
-      main.anchor = function () {
+      main.bind= function () {
         this.anchorToParent({
           top: true,
           right: true,
@@ -54,7 +54,7 @@
       this.add(list, box, main);      
       return this
     },
-    anchor: function () {
+   bind( function () {
       return this.fitWindow();
     }
   }
