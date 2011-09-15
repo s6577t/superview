@@ -7,11 +7,6 @@ describe('superview', function () {
     expect(v2.vid()).not.toEqual(v3.vid());    
   })  
   
-  it("should have a hasViewMixin flag", function () {
-    var v1 = new View1
-    expect(v1.hasViewMixin).toBe(true);
-  })
-  
   it("return the set controller correctly", function () {
     var view = new Superview;
     var ctrlr = {};

@@ -3,8 +3,8 @@
   Superview = function () {
       
     eventify(this).define( 
-      'onResized', // (source_view, rect, outerRect)
-      'onMoved', // (source_view, rect, outerRect)
+      'onResized', // (sourceView)
+      'onMoved', // (sourceView)
       'onSubviewAdded', // (child, parent)
       'onSubviewRemoved', // (child, parent)
       'onAdded', // (child, parent)
@@ -15,19 +15,20 @@
     this.onMoved().throttle(10);
     
     extend(this).withObject({
-      hasViewMixin: true,
       _controller: null,
       _parent: null,
       _anchoring: null,
       _subviews: {},
       _restrictions: {},
-      _rect: {
+      _size: {
+        width: 0,
+        height: 0
+      },
+      _position: {
         top: 0,
         right: 0,
         bottom: 0,
-        left: 0,
-        width: 0,
-        height: 0
+        left: 0
       },
       _vid: Superview.vidSpool++,
       _zElem: z.div().css({
@@ -158,6 +159,32 @@
       
       return subs;
     },
+    
+    initialize: function () {
+      var vs = this.subviews(true);
+      vs.unshift(this);
+      vs.forEach(function (view) {
+        view.bind()
+        view.populate()
+      });
+      return this;
+    },
+    render: function () {
+      // NOOP default. override me!
+      return this
+    },
+    bind: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    populate: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    update: function () {
+      return this.populate();
+    },
+
     // rectangle related functionality
     borderMetrics: function () {
       var self = this;
@@ -174,90 +201,43 @@
       
       return m;
     },
-    paddingMetrics: function () {
-      var self = this;
-      var z = this.$();
-      
-      var m = {
-        top:    parseFloat(z.css('paddingTop'), 10) || 0 ,
-        right:  parseFloat(z.css('paddingRight'), 10) || 0,
-        bottom: parseFloat(z.css('paddingBottom'), 10) || 0,
-        left:   parseFloat(z.css('paddingLeft'), 10) || 0
-      }
-      
-      m.width = m.right + m.left;
-      m.height = m.top + m.bottom;
-      
-      return m;
-    },
 
-    resize: function (s, restrictionsCallback) {
+    resize: function (newSize, options) {
+      options = defaultsFor(options, {
+        //restrictionsCallback: function () {}
+      });
+      
+      newSize = new Superview.Rect(newSize);
+      
       var resized = false,
           limited = false,
           thi$ = this.$(),
-          rect = this.rect(),
-          restrictions = this._restrictions;
+          size = this._size,
+          borderMetrics = this.borderMetrics();
       
-      if (Superview.Rect.hasWidth(s)) {
+      if (newSize.hasWidth()) {
         
-        if (restrictions && restrictions.minimum && Superview.Rect.hasWidth(restrictions.minimum) && restrictions.minimum.width > s.width) {
-          limited = true;
-          s.width = restrictions.minimum.width;
-        }
-        
-        if (restrictions && restrictions.maximum && Superview.Rect.hasWidth(restrictions.maximum) && restrictions.maximum.width < s.width) {
-          limited = true;
-          s.width = restrictions.maximum.width;
-        }
-
-        if (s.width != rect.width) {
+       if (newSize.width !== size.width) {
           resized = true;
-          rect.width = s.width;
-          thi$.css('width', rect.width);
+          size.width = newSize.width;
+          thi$.css('width', Math.max(0, size.width - borderMetrics.width));
         }
       }
       
-      if (Superview.Rect.hasHeight(s)) {
+      if (newSize.hasHeight()) {
         
-        if (restrictions && restrictions.minimum && Superview.Rect.hasHeight(restrictions.minimum) && restrictions.minimum.height > s.height) {
-          limited = true;
-          s.height = restrictions.minimum.height;
-        }
-        
-        if (restrictions && restrictions.maximum && Superview.Rect.hasHeight(restrictions.maximum) && restrictions.maximum.height < s.height) {
-          limited = true;
-          s.height = restrictions.maximum.height;
-        }
-        
-        if (s.height != rect.height) {
+       if (newSize.height !== size.height) {
           resized = true;
-          rect.height = s.height;
-          thi$.css('height', rect.height);
+          size.height = newSize.height;
+          thi$.css('height', Math.max(0, size.height - borderMetrics.height));
         }
       }
       
       if (resized) {
-        this.onResized().emit(this, this.rect(), this.outerRect());
-      }
-      
-      if (limited && restrictionsCallback) {
-        restrictionsCallback.call(this);
+        this.onResized().emit(this);
       }
       
       return this;
-    },
-    outerResize: function (s, restrictionsCallback) {
-      var z = this.$();
-      
-      if (Superview.Rect.hasWidth(s)) {
-        s.width = s.width - (this.paddingMetrics().width + this.borderMetrics().width);
-      }
-      
-      if (Superview.Rect.hasHeight(s)) {
-        s.height = s.height - (this.paddingMetrics().height + this.borderMetrics().height);
-      }
-      
-      return this.resize(s, restrictionsCallback);
     },
 
     restrictTo: function (restrictions) {
@@ -362,17 +342,12 @@
       
       return this;
     },
-    outerMoveTo: function (p) {
-      // translate this call into a repositioning of the inner rectangle
-      p = Superview.Rect.toInner(this, p);
-      return this.moveTo(p);
+    
+    size: function () {
+      return this._size;
     },
-
-    rect: function () {
-      return extend({}).withObject(this._rect);
-    },
-    outerRect: function () {
-      return Superview.Rect.toOuter(this, this._rect);
+    position: function () {
+      
     },
 
     anchorTo: function (otherView, anchoring) {
@@ -538,31 +513,6 @@
       }
       
       return this;
-    },
-
-    initialize: function () {
-      var vs = this.subviews(true);
-      vs.unshift(this);
-      vs.forEach(function (view) {
-        view.bind()
-        view.populate()
-      });
-      return this;
-    },
-    render: function () {
-      // NOOP default. override me!
-      return this
-    },
-    bind: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    populate: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    update: function () {
-      return this.populate();
     },
 
     /*
