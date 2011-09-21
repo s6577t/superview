@@ -19,7 +19,10 @@
       _parent: null,
       _anchoring: null,
       _subviews: {},
-      _restrictions: {},
+      _restrictions: {
+        minimum: {},
+        maximum: {}
+      },
       _size: {
         width: 0,
         height: 0
@@ -185,7 +188,6 @@
       return this.populate();
     },
 
-    // rectangle related functionality
     borderMetrics: function () {
       var self = this;
       var z = this.$();
@@ -242,112 +244,90 @@
 
     restrictTo: function (restrictions) {
       var self = this;
-      this._restrictions = restrictions;
-      
-      var rect = null;
-      
-      if (restrictions.minimum) {
-        
-        if (restrictions.maximum) {
-          if ((restrictions.minimum.width > restrictions.maximum.width) || (restrictions.minimum.height > restrictions.maximum.height)) {
-            throw new Error('minimum bounds must be less that maximum bounds')
-          }
+      var size = this.size();
+      restrictions = new Superview.Restrictions(restrictions);
+
+      ['minimum', 'maximum'].forEach(function (limit) {
+        limit = restrictions[limit];
+
+        if (limit.hasTop() && !limit.hasBottom()) {
+          limit.bottom = limit.top + size.height;
         }
-        
-        var min = restrictions.minimum;
-        rect = self.rect();
-        
-        rect.width = Math.max(min.width, rect.width);
-        rect.height = Math.max(min.height, rect.height);
-      }
 
-      if (restrictions.maximum) {
-        var max = restrictions.maximum;
-        rect = rect || self.rect();
-        
-        rect.width = Math.min(max.width, rect.width);
-        rect.height = Math.min(max.height, rect.height);
-      }
-      
-      if (rect) {
-        self.resize(rect);
-      }
+        if (!limit.hasTop() && limit.hasBottom()) {
+          limit.top = limit.bottom - size.height;
+        }
 
+        if (limit.hasLeft() && !limit.hasRight()) {
+          limit.right = limit.left + size.width;
+        }
+
+        if (!limit.hasLeft() && limit.hasRight()) {
+          limit.left = limit.right - size.width;
+        }
+
+        // fix the min/max width/height to ZERO
+        ['width', 'height'].forEach(function (dimension) {
+          limit[dimension] = Math.max(0, limit[dimension]);
+        })
+      });
+
+      // if (restrictions.minimum.height > restrictions.maximum.height) {
+      //         
+      //       }
+
+      this._restrictions = restrictions;
       return this;
     },
     restrictions: function () {
       return this._restrictions;
     },
-    outerRestrictTo: function (outerRestrictions) {
-      var restrictions = outerRestrictions;
-      
-      if (restrictions.minimum) {
-        restrictions.minimum = Superview.Rect.toOuter(this, restrictions.minimum);
-      }
-      
-      if (restrictions.maximum) {
-        restrictions.maximum = Superview.Rect.toOuter(this, restrictions.maximum);
-      }
-      
-      return this.restrictTo(restrictions);
-    },
-    outerRestrictions: function () {
-      var restrictions = this._restrictions;
-      
-      if (restrictions.minimum) {
-        restrictions.minimum = Superview.Rect.toOuter(this, restrictions.minimum);
-      }
-      
-      if (restrictions.maximum) {
-        restrictions.maximum = Superview.Rect.toOuter(this, restrictions.maximum);
-      }
-      
-      return restrictions;
-    },
     
-    moveTo: function (p) {
+    moveTo: function (newPosition) {
       
-      // TODO: limit bounds
-      NotImplemented();
-      
+      newPosition = new Superview.Rect(newPosition);
+
       var moved = false;
-      var z = this.$();
-      var r = this.rect();
-      var paddingMetrics = this.paddingMetrics();
-      var borderMetrics = this.borderMetrics();
-      
-      if (!Superview.Rect.hasTop(p) && Superview.Rect.hasBottom(p)) {
-        p.top = p.bottom - r.height;
+      var thi$ = this.$();
+      var position = this._position;
+      var size = this.size();
+
+      if (newPosition.hasRight() && !newPosition.hasLeft()) {
+        newPosition.left = newPosition.right - size.width;
       }
       
-      if (!Superview.Rect.hasLeft(p) && Superview.Rect.hasRight(p)) {
-        p.left = p.right - r.width;
+      if (newPosition.hasBottom() && !newPosition.hasTop()) {
+        newPosition.top = newPosition.bottom - size.height;
       }
-      
-      if (Superview.Rect.hasTop(p) && p.top != r.top) {
+
+      if (newPosition.hasLeft() && newPosition.left != position.left) {
         moved = true;
-        r.top = p.top - paddingMetrics.top - borderMetrics.top;
-        z.css('top', r.top);
+        position.left = newPosition.left;
+        thi$.css('left', position.left);
       }
-      
-      if (typeof p.left === 'number' && p.left != r.left) {
+
+      if (newPosition.hasTop() && newPosition.top != position.top) {
         moved = true;
-        r.left = p.left - paddingMetrics.left - borderMetrics.left;
-        z.css('left', r.left);
+        position.top = newPosition.top;
+        thi$.css('top', position.top);
       }
-            
+
       if (moved) {
-        this.onMoved().emit(this, this.rect(), this.outerRect());
+
+        position.right = position.left + size.width;
+        position.bottom = position.top + size.height;
+
+        this.onMoved().emit(this);
       }
-      
+
       return this;
     },
-    
+
     size: function () {
       return this._size;
     },
     position: function () {
-      
+      return this._position;
     },
 
     anchorTo: function (otherView, anchoring) {

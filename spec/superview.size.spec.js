@@ -7,11 +7,11 @@ describe('superview.size', function () {
   });
   
   describe('resize()', function () {
-    
+
     beforeEach(function () {
       view.$().css({border: 'solid 13px red'});
     })
-    
+
     it('should pass on the dimensions to the dom element without any border', function () {
       view.$().css({
         border: 'solid 5px red'
@@ -51,7 +51,7 @@ describe('superview.size', function () {
 
       expect(view.onResized().emit).not.toHaveBeenCalled();
     });
-  
+
     xit('should not set the dimensions to greater that the max', function () {
       NotImpemented()
       view.restrictTo({
@@ -64,7 +64,7 @@ describe('superview.size', function () {
       expect(view.rect().width).toBe(300);
       expect(view.rect().height).toBe(300);
     });
-    
+
     xit('should not set the dimensions to less that the min', function () {
       NotImplemented()
       view.restrictTo({
@@ -76,7 +76,7 @@ describe('superview.size', function () {
       view.resize({width: 300, height: 300});
       expect(view.rect()).toBeTheSameSizeAs({width: 301, height: 301});
     });
-    
+
     xit("should fire a callback when the size is limited by maximum", function () {
       NotImplemented()
       view.restrictTo({
@@ -94,8 +94,8 @@ describe('superview.size', function () {
       
       expect(called).toBe(true);
     });
-    
-    xit("should fire a callback when the size is limited by maximum", function () {
+
+    xit("should fire a callback when the size is limited by minimum", function () {
       NotImplemented()
       view.resize({width: 60, height: 60});
 
@@ -115,7 +115,7 @@ describe('superview.size', function () {
       
       expect(called).toBe(true);
     });
-    
+
     xit('should be able to set the size to the maximum dimensions', function () {
       NotImplemented()
       view.restrictTo({
@@ -133,7 +133,7 @@ describe('superview.size', function () {
       expect(view.rect()).toBeTheSameSizeAs({width: 300, height: 300});
       expect(called).toBe(false);
     });
-    
+
     xit('should be able to set the size to the minimum dimensions', function () {
       NotImplemented()
       view.restrictTo({
@@ -151,13 +151,13 @@ describe('superview.size', function () {
       expect(view.rect()).toBeTheSameSizeAs({width: 300, height: 300});
       expect(called).toBe(false);
     });
-    
+
     xit('should not include borders by default', function () {
       view.resize({width: 334, height: 123});
       expect(view.size()).toEqualRect({width: 334, height: 123});
       expect(view.size()).toEqualRect({width: view.$().width(), height: view.$().height()});
     })
-    
+
     xdescribe('when including the border', function () {
       it('should set the size inclusive of padding and border', function () {
 
