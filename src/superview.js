@@ -245,12 +245,14 @@
     restrictTo: function (restrictions) {
       var self = this;
       var size = this.size();
+      var position = this.position();
       restrictions = new Superview.Restrictions(restrictions);
-
+      
+      // preprocessing to normalize the input
       ['minimum', 'maximum'].forEach(function (limit) {
         limit = restrictions[limit];
 
-        if (limit.hasTop() && !limit.hasBottom()) {
+        if (limit.hasTop()) {
           limit.bottom = limit.top + size.height;
         }
 
@@ -258,7 +260,7 @@
           limit.top = limit.bottom - size.height;
         }
 
-        if (limit.hasLeft() && !limit.hasRight()) {
+        if (limit.hasLeft()) {
           limit.right = limit.left + size.width;
         }
 
@@ -268,15 +270,71 @@
 
         // fix the min/max width/height to ZERO
         ['width', 'height'].forEach(function (dimension) {
-          limit[dimension] = Math.max(0, limit[dimension]);
-        })
+          if (limit[dimension]) {
+            limit[dimension] = Math.max(0, limit[dimension]);
+          }
+        });
       });
 
-      // if (restrictions.minimum.height > restrictions.maximum.height) {
-      //         
-      //       }
+      ['top', 'left', 'width', 'height'].forEach(function (component) {
+        if (restrictions.minimum.has(component) && 
+            restrictions.maximum.has(component) &&
+            restrictions.minimum[component] > restrictions.maximum[component]) {
+          throw new Error("Cannot set the minimum {component}={min} greater than the maximum {component}={max}".supplant({
+            component: component,
+            min: restrictions.minimum[component],
+            max: restrictions.maximum[component]
+          }))
+        }
+      });
 
-      this._restrictions = restrictions;
+      // resize if necessary to fit the bounds
+      var resize = new Superview.Rect;
+
+      if (restrictions.minimum.hasWidth() && (size.width > restrictions.minimum.width)) {
+        resize.width = restrictions.minimum.width;
+      }
+
+      if (restrictions.maximum.hasWidth() && (size.width < restrictions.maximum.width)) {
+        resize.width = restrictions.maximum.width;
+      }
+
+      if (restrictions.minimum.hasHeight() && (size.height > restrictions.minimum.height)) {
+        resize.height = restrictions.minimum.height;
+      }
+
+      if (restrictions.maximum.hasHeight() && (size.height < restrictions.maximum.height)) {
+        resize.height = restrictions.maximum.height;
+      }
+
+      if (resize.hasWidth() || resize.hasHeight()) {
+        self.resize(resize);
+      }
+
+      // move if necessery to fit the bounds
+      var move = new Superview.Rect;
+
+      if (restrictions.minimum.hasLeft() && (position.left > restrictions.minimum.left)) {
+        move.left = restrictions.minimum.left;
+      }
+
+      if (restrictions.maximum.hasLeft() && (position.left < restrictions.maximum.left)) {
+        move.left = restrictions.maximum.left;
+      }
+
+      if (restrictions.minimum.hasTop() && (position.top > restrictions.minimum.top)) {
+        move.top = restrictions.minimum.top;
+      }
+
+      if (restrictions.maximum.hasTop() && (position.top < restrictions.maximum.top)) {
+        move.top = restrictions.maximum.top;
+      }
+
+      if (move.hasTop() || move.hasLeft() || move.hasRight() || move.hasBottom()) {
+        self.moveTo(move);
+      }
+
+      this._restrictions = restrictions.flatten();
       return this;
     },
     restrictions: function () {
