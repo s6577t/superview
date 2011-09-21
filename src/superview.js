@@ -291,19 +291,19 @@
       // resize if necessary to fit the bounds
       var resize = new Superview.Rect;
 
-      if (restrictions.minimum.hasWidth() && (size.width > restrictions.minimum.width)) {
+      if (restrictions.minimum.hasWidth() && (size.width < restrictions.minimum.width)) {
         resize.width = restrictions.minimum.width;
       }
 
-      if (restrictions.maximum.hasWidth() && (size.width < restrictions.maximum.width)) {
+      if (restrictions.maximum.hasWidth() && (size.width > restrictions.maximum.width)) {
         resize.width = restrictions.maximum.width;
       }
 
-      if (restrictions.minimum.hasHeight() && (size.height > restrictions.minimum.height)) {
+      if (restrictions.minimum.hasHeight() && (size.height < restrictions.minimum.height)) {
         resize.height = restrictions.minimum.height;
       }
 
-      if (restrictions.maximum.hasHeight() && (size.height < restrictions.maximum.height)) {
+      if (restrictions.maximum.hasHeight() && (size.height > restrictions.maximum.height)) {
         resize.height = restrictions.maximum.height;
       }
 
@@ -314,19 +314,19 @@
       // move if necessery to fit the bounds
       var move = new Superview.Rect;
 
-      if (restrictions.minimum.hasLeft() && (position.left > restrictions.minimum.left)) {
+      if (restrictions.minimum.hasLeft() && (position.left < restrictions.minimum.left)) {
         move.left = restrictions.minimum.left;
       }
 
-      if (restrictions.maximum.hasLeft() && (position.left < restrictions.maximum.left)) {
+      if (restrictions.maximum.hasLeft() && (position.left > restrictions.maximum.left)) {
         move.left = restrictions.maximum.left;
       }
 
-      if (restrictions.minimum.hasTop() && (position.top > restrictions.minimum.top)) {
+      if (restrictions.minimum.hasTop() && (position.top < restrictions.minimum.top)) {
         move.top = restrictions.minimum.top;
       }
 
-      if (restrictions.maximum.hasTop() && (position.top < restrictions.maximum.top)) {
+      if (restrictions.maximum.hasTop() && (position.top > restrictions.maximum.top)) {
         move.top = restrictions.maximum.top;
       }
 
