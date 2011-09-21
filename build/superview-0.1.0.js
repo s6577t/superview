@@ -10,8 +10,8 @@ var KeyCodes = {
   Superview = function () {
       
     eventify(this).define( 
-      'onResized', // (source_view, rect, outerRect)
-      'onMoved', // (source_view, rect, outerRect)
+      'onResized', // (sourceView)
+      'onMoved', // (sourceView)
       'onSubviewAdded', // (child, parent)
       'onSubviewRemoved', // (child, parent)
       'onAdded', // (child, parent)
@@ -22,11 +22,24 @@ var KeyCodes = {
     this.onMoved().throttle(10);
     
     extend(this).withObject({
-      hasViewMixin: true,
       _controller: null,
       _parent: null,
       _anchoring: null,
       _subviews: {},
+      _restrictions: {
+        minimum: {},
+        maximum: {}
+      },
+      _size: {
+        width: 0,
+        height: 0
+      },
+      _position: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
       _vid: Superview.vidSpool++,
       _zElem: z.div().css({
         overflow: 'hidden',
@@ -92,7 +105,7 @@ var KeyCodes = {
       }
       return ancestors;
     },
-    
+
     isRoot: function () { 
       return !this.parent(); 
     },
@@ -103,7 +116,7 @@ var KeyCodes = {
       }
       return v;
     },
-    // () to remove from parent, an array and any number of arguments ro remove each of them
+    // () to remove from parent, an array and any number of arguments to remove each of them
     remove: function () {
       
       var self = this;
@@ -156,7 +169,32 @@ var KeyCodes = {
       
       return subs;
     },
-    // rectangle related functionality
+    
+    initialize: function () {
+      var vs = this.subviews(true);
+      vs.unshift(this);
+      vs.forEach(function (view) {
+        view.bind()
+        view.populate()
+      });
+      return this;
+    },
+    render: function () {
+      // NOOP default. override me!
+      return this
+    },
+    bind: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    populate: function () {
+      // NOOP. Override me!
+      return this;
+    },
+    update: function () {
+      return this.populate();
+    },
+
     borderMetrics: function () {
       var self = this;
       var z = this.$();
@@ -172,160 +210,204 @@ var KeyCodes = {
       
       return m;
     },
-    paddingMetrics: function () {
-      var self = this;
-      var z = this.$();
-      
-      var m = {
-        top:    parseFloat(z.css('paddingTop'), 10) || 0 ,
-        right:  parseFloat(z.css('paddingRight'), 10) || 0,
-        bottom: parseFloat(z.css('paddingBottom'), 10) || 0,
-        left:   parseFloat(z.css('paddingLeft'), 10) || 0
+
+    resize: function (newSize) {
+
+      newSize = new Superview.Rect(newSize);
+
+      var resized = false,
+          thi$ = this.$(),
+          size = this._size,
+          restrictions = new Superview.Restrictions(this.restrictions()),
+          borderMetrics = this.borderMetrics();
+
+      if (newSize.hasWidth()) {
+
+        if (restrictions.minimum.hasWidth() && (newSize.width < restrictions.minimum.width)) {
+          newSize.width = restrictions.minimum.width;
+        }
+
+        if (restrictions.maximum.hasWidth() && (newSize.width > restrictions.maximum.width)) {
+          newSize.width = restrictions.maximum.width;
+        } 
+
+        if (newSize.width !== size.width) {
+          resized = true;
+          size.width = newSize.width;
+          thi$.css('width', Math.max(0, size.width - borderMetrics.width));
+        }
       }
-      
-      m.width = m.right + m.left;
-      m.height = m.top + m.bottom;
-      
-      return m;
-    },
-    
-    resize: function (s) {
-      var resized = false;
-      var z = this.$();
-      var r = this.rect();
-      
-      if (Superview.Rect.hasWidth(s) && s.width != r.width) {
-        resized = true;
-        r.width = s.width;
-        z.css('width', r.width);
+
+      if (newSize.hasHeight()) {
+
+        if (restrictions.minimum.hasHeight() && (newSize.height < restrictions.minimum.height)) {
+          newSize.height = restrictions.minimum.height;
+        }
+
+        if (restrictions.maximum.hasHeight() && (newSize.height > restrictions.maximum.height)) {
+          newSize.height = restrictions.maximum.height;
+        }
+
+       if (newSize.height !== size.height) {
+          resized = true;
+          size.height = newSize.height;
+          thi$.css('height', Math.max(0, size.height - borderMetrics.height));
+        }
       }
-      
-      if (Superview.Rect.hasHeight(s) && s.height != r.height) {
-        resized = true;
-        r.height = s.height;
-        z.css('height', r.height);
-      }
-      
+
       if (resized) {
-        this.onResized().emit(this, this.rect(), this.outerRect());
+        this.onResized().emit(this);
       }
       
       return this;
     },
-    outerResize: function (s) {
-      var z = this.$();
+
+    restrictTo: function (restrictions) {
+      var self = this;
+      var size = this.size();
+      var position = this.position();
+      restrictions = new Superview.Restrictions(restrictions);
       
-      if (Superview.Rect.hasWidth(s)) {
-        s.width = s.width - (this.paddingMetrics().width + this.borderMetrics().width);
+      // preprocessing to normalize the input
+      ['minimum', 'maximum'].forEach(function (limit) {
+        limit = restrictions[limit];
+
+        if (limit.hasTop()) {
+          limit.bottom = limit.top + size.height;
+        }
+
+        if (!limit.hasTop() && limit.hasBottom()) {
+          limit.top = limit.bottom - size.height;
+        }
+
+        if (limit.hasLeft()) {
+          limit.right = limit.left + size.width;
+        }
+
+        if (!limit.hasLeft() && limit.hasRight()) {
+          limit.left = limit.right - size.width;
+        }
+
+        // fix the min/max width/height to ZERO
+        ['width', 'height'].forEach(function (dimension) {
+          if (limit[dimension]) {
+            limit[dimension] = Math.max(0, limit[dimension]);
+          }
+        });
+      });
+
+      ['top', 'left', 'width', 'height'].forEach(function (component) {
+        if (restrictions.minimum.has(component) && 
+            restrictions.maximum.has(component) &&
+            restrictions.minimum[component] > restrictions.maximum[component]) {
+          throw new Error("Cannot set the minimum {component}={min} greater than the maximum {component}={max}".supplant({
+            component: component,
+            min: restrictions.minimum[component],
+            max: restrictions.maximum[component]
+          }))
+        }
+      });
+
+      // resize if necessary to fit the bounds
+      var resize = new Superview.Rect;
+
+      if (restrictions.minimum.hasWidth() && (size.width < restrictions.minimum.width)) {
+        resize.width = restrictions.minimum.width;
       }
-      
-      if (Superview.Rect.hasHeight(s)) {
-        s.height = s.height - (this.paddingMetrics().height + this.borderMetrics().height);
+
+      if (restrictions.maximum.hasWidth() && (size.width > restrictions.maximum.width)) {
+        resize.width = restrictions.maximum.width;
       }
-      
-      return this.resize(s);
+
+      if (restrictions.minimum.hasHeight() && (size.height < restrictions.minimum.height)) {
+        resize.height = restrictions.minimum.height;
+      }
+
+      if (restrictions.maximum.hasHeight() && (size.height > restrictions.maximum.height)) {
+        resize.height = restrictions.maximum.height;
+      }
+
+      if (resize.hasWidth() || resize.hasHeight()) {
+        self.resize(resize);
+      }
+
+      // move if necessery to fit the bounds
+      var move = new Superview.Rect;
+
+      if (restrictions.minimum.hasLeft() && (position.left < restrictions.minimum.left)) {
+        move.left = restrictions.minimum.left;
+      }
+
+      if (restrictions.maximum.hasLeft() && (position.left > restrictions.maximum.left)) {
+        move.left = restrictions.maximum.left;
+      }
+
+      if (restrictions.minimum.hasTop() && (position.top < restrictions.minimum.top)) {
+        move.top = restrictions.minimum.top;
+      }
+
+      if (restrictions.maximum.hasTop() && (position.top > restrictions.maximum.top)) {
+        move.top = restrictions.maximum.top;
+      }
+
+      if (move.hasTop() || move.hasLeft() || move.hasRight() || move.hasBottom()) {
+        self.moveTo(move);
+      }
+
+      this._restrictions = restrictions.flatten();
+      return this;
+    },
+    restrictions: function () {
+      return this._restrictions;
     },
     
-    moveTo: function (p) {
+    moveTo: function (newPosition) {
+      
+      newPosition = new Superview.Rect(newPosition);
+
       var moved = false;
-      var z = this.$();
-      var r = this.rect();
-      var paddingMetrics = this.paddingMetrics();
-      var borderMetrics = this.borderMetrics();
-      
-      if (!Superview.Rect.hasTop(p) && Superview.Rect.hasBottom(p)) {
-        p.top = p.bottom - r.height;
+      var thi$ = this.$();
+      var position = this._position;
+      var size = this.size();
+
+      if (newPosition.hasRight() && !newPosition.hasLeft()) {
+        newPosition.left = newPosition.right - size.width;
       }
       
-      if (!Superview.Rect.hasLeft(p) && Superview.Rect.hasRight(p)) {
-        p.left = p.right - r.width;
+      if (newPosition.hasBottom() && !newPosition.hasTop()) {
+        newPosition.top = newPosition.bottom - size.height;
       }
-      
-      if (Superview.Rect.hasTop(p) && p.top != r.top) {
+
+      if (newPosition.hasLeft() && newPosition.left != position.left) {
         moved = true;
-        r.top = p.top - paddingMetrics.top - borderMetrics.top;
-        z.css('top', r.top);
+        position.left = newPosition.left;
+        thi$.css('left', position.left);
       }
-      
-      if (typeof p.left === 'number' && p.left != r.left) {
+
+      if (newPosition.hasTop() && newPosition.top != position.top) {
         moved = true;
-        r.left = p.left - paddingMetrics.left - borderMetrics.left;
-        z.css('left', r.left);
+        position.top = newPosition.top;
+        thi$.css('top', position.top);
       }
-      
+
       if (moved) {
-        this.onMoved().emit(this, this.rect(), this.outerRect());
+
+        position.right = position.left + size.width;
+        position.bottom = position.top + size.height;
+
+        this.onMoved().emit(this);
       }
-      
+
       return this;
     },
-    outerMoveTo: function (p) {
-      var z = this.$();
-      var paddingMetrics = this.paddingMetrics();
-      var borderMetrics = this.borderMetrics();
-      
-      // translate this call into a repositioning of the inner rectangle
-      
-      if (Superview.Rect.hasTop(p)) {
-        p.top += paddingMetrics.top + borderMetrics.top;
-      } 
-      
-      if (Superview.Rect.hasBottom(p)) {
-        p.bottom -= paddingMetrics.bottom + borderMetrics.bottom
-      }
-      
-      if (Superview.Rect.hasLeft(p)) {
-        p.left += paddingMetrics.left + borderMetrics.left
-      }
-      
-      if (Superview.Rect.hasRight(p)) {
-        p.right -= paddingMetrics.right + borderMetrics.right;
-      }
-      
-      return this.moveTo(p);
+
+    size: function () {
+      return this._size;
     },
-    
-    rect: function () {
-      var self = this;
-      var z = this.$();
-      var p = {
-        left: parseFloat(z.css('left'), 10),
-        top: parseFloat(z.css('top'), 10)
-      };
-  
-      var r = {
-        top: p.top + self.paddingMetrics().top + self.borderMetrics().top,
-        left: p.left + self.paddingMetrics().left + self.borderMetrics().left,
-        width: z.width(),
-        height: z.height() 
-      };
-      
-      r.right = r.left + r.width;
-      r.bottom = r.top + r.height;
-      
-      return r;
+    position: function () {
+      return this._position;
     },
-    outerRect: function () {
-      var self = this;
-      var z = this.$();
-      var p = {
-        left: parseFloat(z.css('left'), 10),
-        top: parseFloat(z.css('top'), 10)
-      };
-      
-      var r = {
-        top: p.top ,
-        left: p.left,
-        width: z.outerWidth(),
-        height: z.outerHeight() 
-      };
-      
-      r.right = r.left + r.width;
-      r.bottom = r.top + r.height;
-      
-      return r;
-    },
-    
+
     anchorTo: function (otherView, anchoring) {
       var self = this;
       
@@ -490,32 +572,7 @@ var KeyCodes = {
       
       return this;
     },
-    
-    initialize: function () {
-      var vs = this.subviews(true);
-      vs.unshift(this);
-      vs.forEach(function (view) {
-        view.anchor()
-        view.populate()
-      });
-      return this;
-    },
-    render: function () {
-      // NOOP default. override me!
-      return this
-    },
-    anchor: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    populate: function () {
-      // NOOP. Override me!
-      return this;
-    },
-    update: function () {
-      return this.populate();
-    },
-    
+
     /*
       deanchor listeners and nullify local variable
       edging when resizable
@@ -549,9 +606,9 @@ var KeyCodes = {
       })
     }
   }
-  
+
   Superview.vidSpool = 1;
-  
+
 })(jQuery)
 ;
 ;
@@ -584,57 +641,77 @@ Superview.Page = (function () {
 
 ;
 ;
-(function () {
-  
-  Superview.Rect = {
-    hasHeight: function (r) {
-      return r && (typeof r.height === 'number');
-    },
-    hasWidth: function (r) {
-      return r && (typeof r.width === 'number');
-    },
-    hasTop: function (r) {
-      return r && (typeof r.top === 'number');
-    },
-    hasLeft: function (r) {
-      return r && (typeof r.left === 'number');
-    },
-    hasBottom: function (r) {
-      return r && (typeof r.bottom === 'number');
-    },
-    hasRight: function (r) {
-      return r && (typeof r.right === 'number');
-    },
-    samePosition: function () {
-      var args = arguments;
-      var f = args[0];
-      for (var i = 1; i < args.length; i++) {
-        var r = args[i];
-        if (r.top !== f.top && r.left !== f.left) return false;
-      }
-      return true;
-    },
-    sameSize: function () {
-      var args = arguments;
-      var f = args[0];
-      for (var i = 1; i < args.length; i++) {
-        var r = args[i];
-        if (r.width !== f.width && r.height !== f.height) return false;
-      }
-      return true;
-    },
-    areEqual: function () {
-      var args = arguments;
-      var f = args[0];
-      for (var i = 1; i < args.length; i++) {
-        var r = args[i];
-        if (r.top !== f.top && r.left !== f.left && r.width !== f.width && r.height !== f.height) return false;
-      }
-      return true;
-    }   
+Superview.Rect = (function () {
+
+  Rect = function (rect) {
+    extend(this).withObject(rect);
   }
 
+  Rect.prototype = {
+    has: function (member) {
+      return this['has' + member.variableize(true)]();
+    },
+    flatten: function () {
+      var self = this,
+          flat = {};
+
+      ['top', 'left', 'bottom', 'right', 'width', 'height'].forEach(function (member) {
+        if (typeof self[member] !== 'undefined') {
+          flat[member] = self[member];
+        }
+      });
+
+      return flat;
+    }
+  };
+
+  ['Top', 'Right', 'Bottom', 'Left'].forEach(function (edge) {
+    Rect.prototype['has' + edge] = function () {
+      var edgeValue = this[edge.toLowerCase()];
+      return (typeof edgeValue === 'number') && edgeValue !== NaN && edgeValue !== Infinity
+    }
+  });
+
+  ['Width', 'Height'].forEach(function (dimension) {
+    Rect.prototype['has' + dimension] = function () {
+      var dimensionValue = this[dimension.toLowerCase()];
+      return (typeof dimensionValue === 'number') && dimensionValue !== NaN && dimensionValue !== Infinity && dimensionValue >= 0;
+    }
+  });
+
+  return Rect;
 })();
+;
+;
+Superview.Restrictions = (function () {
+
+  Restrictions = function (restrictions) {
+    extend(this).withObject(restrictions);
+    this.minimum = new Superview.Rect(restrictions.minimum);
+    this.maximum = new Superview.Rect(restrictions.maximum);
+  }
+
+  Restrictions.prototype = {
+    flatten: function () {
+
+      var flat = {};
+
+      flat.minimum = this.minimum.flatten();
+      flat.maximum = this.maximum.flatten();
+
+      return flat;
+    }
+  };
+
+  ['Minimum', 'Maximum'].forEach(function (limit) {
+    Restrictions.prototype['has' + limit] = function () {
+      return typeof this[limit.toLowerCase()] === 'object';
+    }
+  })
+
+  return Restrictions;
+})();
+
 ;
 ;
 Superview.Window = (function () {

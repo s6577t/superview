@@ -1,11 +1,63 @@
 describe('superview.size', function () {
-  
+
   var view;
-  
+
   beforeEach(function() {
     view = new Superview;
   });
-  
+
+  describe('css()', function () {
+    it("should be chainable", function() {
+      expect(view.css({})).toBe(view);
+    });
+
+    it("should maintain size()", function() {
+      view.resize({width: 100, height: 100});
+
+      var size0 = view.size();
+      
+      view.css('border', 'solid 1px red');
+
+      var size1 = view.size();
+
+      expect(size0).toEqualRect(size1);
+    });
+
+    it("should not emit an on resized event if the border size changes", function() {
+      spyOn(view.onResized(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onResized().emit).not.toHaveBeenCalled();
+    });
+
+    it("should not emit an on resized event if the border size doesn't change", function() {
+      view.css('border', 'solid 1px red');
+
+      spyOn(view.onResized(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onResized().emit).not.toHaveBeenCalled();
+    });
+
+    it("should adjust the css width/height of the element", function() {
+      view.resize({width: 100, height: 100});
+
+      view.css('border', 'solid 1px red');
+
+      var cssSize = {
+        width: parseInt(view.$().css('width')),
+        height: parseInt(view.$().css('height'))
+      }
+
+      expect(cssSize).toEqualRect({
+        width: 98,
+        height: 98
+      });
+    });
+  })
+
   describe('resize()', function () {
 
     beforeEach(function () {
@@ -52,153 +104,68 @@ describe('superview.size', function () {
       expect(view.onResized().emit).not.toHaveBeenCalled();
     });
 
-    xit('should not set the dimensions to greater that the max', function () {
-      NotImpemented()
-      view.restrictTo({
-        maximum: {
+    describe('when the size is restricted', function () {
+      it('should not set the dimensions to greater that the max', function () {
+        view.restrictTo({
+          maximum: {
+            width: 300,
+            height: 300
+          }
+        });
+        view.resize({width: 301, height: 301});
+        expect(view.size()).toEqualRect({
           width: 300,
           height: 300
-        }
-      });
-      view.resize({width: 301, height: 301});
-      expect(view.rect().width).toBe(300);
-      expect(view.rect().height).toBe(300);
-    });
-
-    xit('should not set the dimensions to less that the min', function () {
-      NotImplemented()
-      view.restrictTo({
-        minimum: {
-          width: 301,
-          height: 301
-        }
-      });
-      view.resize({width: 300, height: 300});
-      expect(view.rect()).toBeTheSameSizeAs({width: 301, height: 301});
-    });
-
-    xit("should fire a callback when the size is limited by maximum", function () {
-      NotImplemented()
-      view.restrictTo({
-        maximum: {
-          width: 40,
-          height: 40
-        }
-      });      
-      
-      var called = false;
-      
-      view.resize({width: 41, height: 41}, function () {
-        called = true;
-      });
-      
-      expect(called).toBe(true);
-    });
-
-    xit("should fire a callback when the size is limited by minimum", function () {
-      NotImplemented()
-      view.resize({width: 60, height: 60});
-
-      view.restrictTo({
-        minimum: {
-          width: 40,
-          height: 40
-        }
-      });
-      
-      
-      var called = false;
-      
-      view.resize({width: 39, height: 39}, function () {
-        called = true;
-      });
-      
-      expect(called).toBe(true);
-    });
-
-    xit('should be able to set the size to the maximum dimensions', function () {
-      NotImplemented()
-      view.restrictTo({
-        maximum: {
-          width: 300,
-          height: 300
-        }
+        });
       });
 
-      var called = false;
-      view.resize({width: 300, height: 300}, function () {
-        called = true;
+      it('should not set the dimensions to less that the min', function () {
+        view.restrictTo({
+          minimum: {
+            width: 301,
+            height: 301
+          }
+        });
+        view.resize({width: 300, height: 300});
+        expect(view.size()).toEqualRect({width: 301, height: 301});
       });
 
-      expect(view.rect()).toBeTheSameSizeAs({width: 300, height: 300});
-      expect(called).toBe(false);
-    });
+      it('should be able to set the size to the maximum dimensions', function () {
 
-    xit('should be able to set the size to the minimum dimensions', function () {
-      NotImplemented()
-      view.restrictTo({
-        minimum: {
-          width: 300,
-          height: 300
-        }
+        view.restrictTo({
+          maximum: {
+            width: 300,
+            height: 300
+          }
+        });
+
+        view.resize({width: 300, height: 300});
+
+        expect(view.size()).toEqualRect({width: 300, height: 300});
       });
 
-      var called = false;
-      view.resize({width: 300, height: 300}, function () {
-        called = true;
+      it('should be able to set the size to the minimum dimensions', function () {
+
+        view.restrictTo({
+          minimum: {
+            width: 300,
+            height: 300
+          }
+        });
+
+        view.resize({width: 300, height: 300});
+
+        expect(view.size()).toEqualRect({width: 300, height: 300});
       });
-
-      expect(view.rect()).toBeTheSameSizeAs({width: 300, height: 300});
-      expect(called).toBe(false);
-    });
-
-    xit('should not include borders by default', function () {
-      view.resize({width: 334, height: 123});
-      expect(view.size()).toEqualRect({width: 334, height: 123});
-      expect(view.size()).toEqualRect({width: view.$().width(), height: view.$().height()});
     })
 
-    xdescribe('when including the border', function () {
-      it('should set the size inclusive of padding and border', function () {
-
-        var v = new Superview();
-        v.$().css({
-          border: 'solid 10px black',
-          padding: 10
-        });
-
-        var s = {width: 123, height: 456};
-        v.outerResize(s);
-
-        expect(v.rect().width).toEqual(83);
-        expect(v.rect().height).toEqual(416);
-      });
-
-      it('should retrieve the size inclusive of border and padding', function () {
-        var v = new Superview();
-        v.outerResize({width: 123, height: 456});
-        expect(v.$().outerWidth()).toEqual(123);
-        expect(v.$().outerHeight()).toEqual(456);
-      });
-
-      it('should pass on the call to resize', function () {
-        var v = new Superview();
-        var callback;
-        spyOn(v, 'resize').andCallFake(function (size, _callback) {
-          callback = _callback;
-        });
-
-        var passedCallback = function () {};
-
-        v.outerResize({width: 123, height: 456}, passedCallback);
-
-        expect(v.resize).toHaveBeenCalled();
-        expect(callback).toBe(passedCallback);
-      });
-    });
   });
 
   describe('size()', function () {
+    it('does not return the internal size object', function () {
+      expect(view.size()).not.toBe(view._size);
+    });
+
     it('should be all zero on a new view', function () {
       "width,height".split(",").forEach(function(m) {
         expect(view.size()[m]).toEqual(0);
@@ -212,22 +179,7 @@ describe('superview.size', function () {
 
       view.resize({width: 100, height: 200});
 
-      var r = view.size();
-      
-      expect(r).toEqualRect({width: 110, height: 210});
-    });
-    
-    xit('should return the width and height excluding border with the includeBorder option set to false', function () {
-      
-      view.$().css({
-        border: 'solid 5px red'
-      });
-
-      view.resize({width: 100, height: 200});
-
-      var r = view.size({includeBorder: false});
-      
-      expect(r).toEqualRect({width: 100, height: 200});
+      expect(view.size()).toEqualRect({width: 100, height: 200});
     });
   });
   

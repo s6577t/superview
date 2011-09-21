@@ -20,7 +20,10 @@
       _anchoring: null,
       _subviews: {},
       _restrictions: {
-        minimum: {},
+        minimum: {
+          width: 0,
+          height: 0
+        },
         maximum: {}
       },
       _size: {
@@ -63,6 +66,21 @@
     },
     $: function () { 
       return this._zElem; 
+    },
+    css: function () {
+      var thi$ = this.$();
+      var priorBorderMetrics = this.borderMetrics();
+
+      thi$.css.apply(thi$, Array.toArray(arguments));
+
+      var borderMetrics = this.borderMetrics(),
+          deltaWidth =  priorBorderMetrics.width - borderMetrics.width,
+          deltaHeight = priorBorderMetrics.height - borderMetrics.height;
+
+      this.$().css('width', parseInt(this.$().css('width')) + deltaWidth);
+      this.$().css('height', parseInt(this.$().css('height')) + deltaHeight);
+
+      return this;
     },
     /*
       View tree members
@@ -204,37 +222,50 @@
       return m;
     },
 
-    resize: function (newSize, options) {
-      options = defaultsFor(options, {
-        //restrictionsCallback: function () {}
-      });
-      
+    resize: function (newSize) {
+
       newSize = new Superview.Rect(newSize);
-      
+
       var resized = false,
-          limited = false,
           thi$ = this.$(),
           size = this._size,
+          restrictions = new Superview.Restrictions(this.restrictions()),
           borderMetrics = this.borderMetrics();
-      
+
       if (newSize.hasWidth()) {
-        
-       if (newSize.width !== size.width) {
+
+        if (restrictions.minimum.hasWidth() && (newSize.width < restrictions.minimum.width)) {
+          newSize.width = restrictions.minimum.width;
+        }
+
+        if (restrictions.maximum.hasWidth() && (newSize.width > restrictions.maximum.width)) {
+          newSize.width = restrictions.maximum.width;
+        } 
+
+        if (newSize.width !== size.width) {
           resized = true;
           size.width = newSize.width;
           thi$.css('width', Math.max(0, size.width - borderMetrics.width));
         }
       }
-      
+
       if (newSize.hasHeight()) {
-        
+
+        if (restrictions.minimum.hasHeight() && (newSize.height < restrictions.minimum.height)) {
+          newSize.height = restrictions.minimum.height;
+        }
+
+        if (restrictions.maximum.hasHeight() && (newSize.height > restrictions.maximum.height)) {
+          newSize.height = restrictions.maximum.height;
+        }
+
        if (newSize.height !== size.height) {
           resized = true;
           size.height = newSize.height;
           thi$.css('height', Math.max(0, size.height - borderMetrics.height));
         }
       }
-      
+
       if (resized) {
         this.onResized().emit(this);
       }
@@ -345,10 +376,11 @@
       
       newPosition = new Superview.Rect(newPosition);
 
-      var moved = false;
-      var thi$ = this.$();
-      var position = this._position;
-      var size = this.size();
+      var moved = false,
+          thi$ = this.$(),
+          position = this._position,
+          size = this.size(),
+          restrictions = new Superview.Restrictions(this.restrictions());
 
       if (newPosition.hasRight() && !newPosition.hasLeft()) {
         newPosition.left = newPosition.right - size.width;
@@ -358,16 +390,38 @@
         newPosition.top = newPosition.bottom - size.height;
       }
 
-      if (newPosition.hasLeft() && newPosition.left != position.left) {
-        moved = true;
-        position.left = newPosition.left;
-        thi$.css('left', position.left);
+      if (newPosition.hasLeft()) {
+        
+        if (restrictions.minimum.hasLeft() && (newPosition.left < restrictions.minimum.left)) {
+          newPosition.left = restrictions.minimum.left;
+        }
+
+        if (restrictions.maximum.hasLeft() && (newPosition.left > restrictions.maximum.left)) {
+          newPosition.left = restrictions.maximum.left;
+        }
+        
+        if (newPosition.left != position.left) {
+          moved = true;
+          position.left = newPosition.left;
+          thi$.css('left', position.left);
+        }
       }
 
-      if (newPosition.hasTop() && newPosition.top != position.top) {
-        moved = true;
-        position.top = newPosition.top;
-        thi$.css('top', position.top);
+      if (newPosition.hasTop()) {
+        
+        if (restrictions.minimum.hasTop() && (newPosition.top < restrictions.minimum.top)) {
+          newPosition.top = restrictions.minimum.top;
+        }
+
+        if (restrictions.maximum.hasTop() && (newPosition.top > restrictions.maximum.top)) {
+          newPosition.top = restrictions.maximum.top;
+        }
+        
+        if (newPosition.top != position.top) {
+          moved = true;
+          position.top = newPosition.top;
+          thi$.css('top', position.top);
+        }
       }
 
       if (moved) {
@@ -382,10 +436,10 @@
     },
 
     size: function () {
-      return this._size;
+      return shallowCopy(this._size);
     },
     position: function () {
-      return this._position;
+      return shallowCopy(this._position);
     },
 
     anchorTo: function (otherView, anchoring) {

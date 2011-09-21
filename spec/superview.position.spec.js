@@ -13,7 +13,12 @@ describe('superview.position', function () {
       expect(parseInt(view.$().css('top'))).toEqual(123);
       expect(parseInt(view.$().css('left'))).toEqual(456);
       
-      expect(view.$().position()).toEqualRect({
+      var css = {
+        left: parseInt(view.$().css('left')),
+        top: parseInt(view.$().css('top'))
+      };
+      
+      expect(css).toEqualRect({
         top: 123,
         left: 456
       });
@@ -33,7 +38,6 @@ describe('superview.position', function () {
 
       expect(view.onMoved().emit).toHaveBeenCalled();
       expect(v).toBe(view);
-      expect(view.position()).toEqualRect(p);
     });
 
     it('should not emit an onMoved event if the position set is the same as the current position', function () {
@@ -58,9 +62,73 @@ describe('superview.position', function () {
         left: 150
       });
     });
+
+    describe('when the position is restricted', function () {
+      it('should not set the position to greater that the max', function () {
+        view.restrictTo({
+          maximum: {
+            left: 300,
+            top: 300
+          }
+        });
+
+        view.moveTo({left: 301, top: 301});
+
+        expect(view.position()).toEqualRect({
+          top: 300,
+          left: 300, 
+          bottom: 300, 
+          right: 300
+        });
+      });
+
+      it('should not set the position to less that the min', function () {
+        view.restrictTo({
+          minimum: {
+            left: 301,
+            top: 301
+          }
+        });
+        view.moveTo({left: 300, top: 300});
+        expect(view.position()).toEqualRect({left: 301, top: 301, bottom: 301, right: 301});
+      });
+
+      it('should be able to set the position to the maximum', function () {
+
+        view.restrictTo({
+          maximum: {
+            left: 300,
+            top: 300
+          }
+        });
+
+        view.moveTo({left: 300, top: 300});
+
+        expect(view.position()).toEqualRect({left: 300, top: 300, bottom: 300, right: 300});
+      });
+
+      it('should be able to set the position to the minimum', function () {
+
+        view.restrictTo({
+          minimum: {
+            left: 300,
+            top: 300
+          }
+        });
+
+        view.moveTo({left: 300, top: 300});
+
+        expect(view.position()).toEqualRect({left: 300, top: 300, bottom: 300, right: 300});
+      });
+    })
+
   });
 
   describe('position()', function () {
+    it('does not return the internal position object', function () {
+      expect(view.position()).not.toBe(view._position);
+    });
+
     it('should be all zero on a new view', function () {
       expect(view.position()).toEqualRect({
         top: 0,
@@ -70,7 +138,7 @@ describe('superview.position', function () {
       })
     });
 
-    it('should returns the top-left-right-bottom of the view', function () {
+    it('should return the top-left-right-bottom of the view', function () {
       view.resize({width: 100, height: 50});
       view.moveTo({top: 10, left: 10});
 

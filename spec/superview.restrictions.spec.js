@@ -41,7 +41,7 @@ describe('superview.restrictions', function () {
     it('should update the current size when the minimum size is set', function () {
       view.resize({width: 0, height: 0});
       
-      spyOn(view, 'resize');
+      spyOn(view, 'resize').andCallThrough();
       
       view.restrictTo({
         minimum: {
@@ -57,7 +57,7 @@ describe('superview.restrictions', function () {
     it('should update the current size when the maximum size is set', function () {
       view.resize({width: 500, height: 500});
       
-      spyOn(view, 'resize');
+      spyOn(view, 'resize').andCallThrough();
       
       view.restrictTo({
         maximum: {
@@ -73,7 +73,7 @@ describe('superview.restrictions', function () {
     it('should update the current position when the maximum position is set', function () {
       view.moveTo({top: 500, left: 500});
 
-      spyOn(view, 'moveTo');
+      spyOn(view, 'moveTo').andCallThrough();
 
       view.restrictTo({
         maximum: {
@@ -82,14 +82,14 @@ describe('superview.restrictions', function () {
         }
       });
 
-      expect(view.position()).toEqualRect({top: 100, left: 100});
+      expect(view.position()).toEqualRect({top: 100, left: 100, bottom: 100, right: 100});
       expect(view.moveTo).toHaveBeenCalled();
     });
 
     it('should update the current position when the minimum position is set', function () {
       view.moveTo({top: 500, left: 500});
 
-      spyOn(view, 'moveTo');
+      spyOn(view, 'moveTo').andCallThrough();
 
       view.restrictTo({
         minimum: {
@@ -98,7 +98,7 @@ describe('superview.restrictions', function () {
         }
       });
 
-      expect(view.position()).toEqualRect({top: 600, left: 600});
+      expect(view.position()).toEqualRect({top: 600, left: 600, bottom: 600, right: 600});
       expect(view.moveTo).toHaveBeenCalled();
     });
 
@@ -161,9 +161,12 @@ describe('superview.restrictions', function () {
       }).toThrowAnError();
     });
 
-    it('should accept an empty object as no limits', function () {
+    it('should accept an empty object as default limits', function () {
       view.restrictTo({})
-      expect(view.restrictions()).toEqualRestrictions({minimum:{}, maximum:{}});
+      expect(view.restrictions()).toEqualRestrictions({minimum:{
+        width: 0,
+        height: 0
+      }, maximum:{}});
     });
     
     it("should default negative width/height values to zero", function() {
@@ -227,8 +230,11 @@ describe('superview.restrictions', function () {
       })
     });
 
-    it("should return no restrictions by default", function() {
-      expect(view.restrictions()).toEqualRestrictions({minimum:{}, maximum:{}});
+    it("should return width/height zero min restrictions by default", function() {
+      expect(view.restrictions()).toEqualRestrictions({minimum:{
+        width: 0,
+        height: 0
+      }, maximum:{}});
     });
 
     it("should translate restrictions to all four edges", function() {

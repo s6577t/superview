@@ -1,13 +1,17 @@
 1:
   /a: fix basic superview.position
-  b: finish impl superview.restrictions INCL additional resize() and moveTo() specs to prevent resizing and moving beyond restritions
   c: handle css filtering
+  ! What to do when the border is set after the width
+  ! what about when (EG) the size is width:100 but border-width:51 ---> don't allow that border width
+      ! also need to check when setting size that the contentArea is not negative
+      
     > Superview#css()
     > checks border metrics compared to before css changes
       and resizes the view etc.
     > faux pas: margin, border, padding, position, dimension, max-dimension, min-dimensions
       FILTER these from calls
     > delete the css method from return jqueries
+  b: finish impl superview.restrictions INCL additional resize() AND moveTo() specs to prevent resizing and moving beyond restritions
   d: contentArea()
     > view.contentArea().[resize|moveTo|size|position|restrictTo|anchorTo]()
 
