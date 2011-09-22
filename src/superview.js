@@ -68,19 +68,28 @@
       return this._zElem; 
     },
     css: function () {
+      var args = Array.toArray(arguments);
+
+      var getting = (args.length === 1) && (typeof args[0] === 'string');
       var thi$ = this.$();
-      var priorBorderMetrics = this.borderMetrics();
+      
+      if (getting) {
+        return thi$.css(args[0]);
+      } else {
+        
+        var priorBorderMetrics = this.borderMetrics();
 
-      thi$.css.apply(thi$, Array.toArray(arguments));
+        thi$.css.apply(thi$, args);
 
-      var borderMetrics = this.borderMetrics(),
-          deltaWidth =  priorBorderMetrics.width - borderMetrics.width,
-          deltaHeight = priorBorderMetrics.height - borderMetrics.height;
+        var borderMetrics = this.borderMetrics(),
+            deltaWidth =  priorBorderMetrics.width - borderMetrics.width,
+            deltaHeight = priorBorderMetrics.height - borderMetrics.height;
 
-      this.$().css('width', parseInt(this.$().css('width')) + deltaWidth);
-      this.$().css('height', parseInt(this.$().css('height')) + deltaHeight);
+        this.$().css('width', parseInt(this.$().css('width')) + deltaWidth);
+        this.$().css('height', parseInt(this.$().css('height')) + deltaHeight);
 
-      return this;
+        return this;
+      }
     },
     /*
       View tree members

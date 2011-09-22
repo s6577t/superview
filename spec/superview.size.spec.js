@@ -7,10 +7,6 @@ describe('superview.size', function () {
   });
 
   describe('css()', function () {
-    it("should be chainable", function() {
-      expect(view.css({})).toBe(view);
-    });
-
     it("should maintain size()", function() {
       view.resize({width: 100, height: 100});
 

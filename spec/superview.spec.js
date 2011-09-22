@@ -74,5 +74,62 @@ describe('superview', function () {
       expect(v.populate).toHaveBeenCalled();
     })
   })
+  
+  describe("css()", function() {
+    
+    var dissallowedExamples = [
+      'margin',
+      'margin-top',
+      'margin-left',
+      'margin-right',
+      'margin-bottom',
+      'marginRight',
+      'marginBottom',
+      'padding',
+      'padding-top',
+      'padding-bottom',
+      'padding-left',
+      'padding-right',
+      'paddingRight',
+      'PADDING-RIGHT',
+      'left', 
+      'top', 
+      'bottom', 
+      'right', 
+      'max-width', 
+      'max-height', 
+      'min-width', 
+      'min-height', 
+      'minWidth',  
+      'width', 
+      'height', 
+    ];
+    
+    it("should filter disallowed css settings", function() {
+      
+      dissallowedExamples.forEach(function (setting) {
+        var view = new Superview;
+        
+        view.css(setting, 1234);
+        expect(parseInt(view.css(setting))).not.toEqual(1234);
+        
+        var css = {};
+        css[setting] = 5678;
+        view.css(css);
+        expect(parseInt(view.css(setting))).not.toEqual(5678);
+      });
+    });
+    
+    it("should return css values when called with a single string arg", function() {
+      var view = new Superview;
+      view.$().css('border-color', 'red');
+      expect(view.css('border-color')).toEqual('red');
+    });  
+    
+    it("should be chainable when setting", function() {
+      var view = new Superview;
+      expect(view.css({cursor: 'pointer'})).toBe(view);
+    });
+  });
 });
 
