@@ -1,14 +1,13 @@
 1:
-  /a: fix basic superview.position
-  b: handle css filtering
-    ! What to do when the border is set after the width
-VISUAL SPECS:    ! what about when (EG) the size is width:100 but border-width:51 ---> don't allow that border width      
-    
-    > faux pas: margin, border, padding, position, dimension, max-dimension, min-dimensions
-      FILTER these from calls
+  
   c: finish impl superview.restrictions INCL additional resize() AND moveTo() specs to prevent resizing and moving beyond restritions
+
+-> VISUAL_SPECS for constraints
+
   d: contentArea()
+    > size changes when its superview's border is set
     > view.contentArea().[resize|moveTo|size|position|restrictTo|anchorTo]()
+    > reintroduce page/window specs
   e: get rid of Superview#$() replace with elem() => HTMLElement
   
 put restrictions() functionality in superview.restrictions and likewise for similar behaviour

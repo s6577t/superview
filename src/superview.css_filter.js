@@ -6,38 +6,16 @@ Superview.CssFilter = (function () {
 
   var filters = [
     /^margin.*/,
-    /^padding.*/
-    // 'margin-top',
-    // 'margin-left',
-    // 'margin-right',
-    // 'margin-bottom',
-    // 'marginRight',
-    // 'marginBottom',
-    // 'padding',
-    // 'padding-top',
-    // 'padding-bottom',
-    // 'padding-left',
-    // 'padding-right',
-    // 'paddingRight',
-    // 'PADDING-RIGHT',
-    // 'left', 
-    // 'top', 
-    // 'bottom', 
-    // 'right', 
-    // 'max-width', 
-    // 'max-height', 
-    // 'min-width', 
-    // 'min-height', 
-    // 'minWidth',  
-    // 'width', 
-    // 'height', 
+    /^padding.*/,
+    /^(min|max).*$/,
+    /^(left|right|top|bottom|width|height)$/
   ];
 
   return {
-    allowed: function (cssKey) {
+    isAllowed: function (cssKey) {
       cssKey = normalizeKey(cssKey);
 
-      for (var i = 0; i < filter.length; i++) {
+      for (var i = 0; i < filters.length; i++) {
         if (cssKey.match(filters[i])) return false;
       }
 
