@@ -48,7 +48,7 @@ THE SOFTWARE.
 
   Superview = function () {
 
-    eventify(this).define( 
+    eventify(this).define(
       'onResized', // (sourceView)
       'onMoved', // (sourceView)
       'onSubviewAdded', // (child, parent)
@@ -90,7 +90,7 @@ THE SOFTWARE.
         left: 0,
         top: 0
       })
-    });    
+    });
   }
 
   Superview.prototype = {
@@ -101,17 +101,17 @@ THE SOFTWARE.
     getController: function () {
       return this._controller;
     },
-    vid: function() { 
-      return this._vid; 
+    vid: function() {
+      return this._vid;
     },
     /*
     DOM related members
     */
-    elem: function () { 
-      return this._zElem.elem(); 
+    elem: function () {
+      return this._zElem.elem();
     },
-    $: function () { 
-      return this._zElem; 
+    $: function () {
+      return this._zElem;
     },
     css: function () {
       var args = Array.toArray(arguments);
@@ -184,8 +184,8 @@ THE SOFTWARE.
       return ancestors;
     },
 
-    isRoot: function () { 
-      return !this.parent(); 
+    isRoot: function () {
+      return !this.parent();
     },
     root: function () {
       var v = this;
@@ -307,7 +307,7 @@ THE SOFTWARE.
 
         if (restrictions.maximum.hasWidth() && (newSize.width > restrictions.maximum.width)) {
           newSize.width = restrictions.maximum.width;
-        } 
+        }
 
         if (newSize.width !== size.width) {
           resized = true;
@@ -375,7 +375,7 @@ THE SOFTWARE.
       });
 
       ['top', 'left', 'width', 'height'].forEach(function (component) {
-        if (restrictions.minimum.has(component) && 
+        if (restrictions.minimum.has(component) &&
         restrictions.maximum.has(component) &&
         restrictions.minimum[component] > restrictions.maximum[component]) {
           throw new Error("Cannot set the minimum {component}={min} greater than the maximum {component}={max}".supplant({
