@@ -121,7 +121,6 @@ describe('superview.position', function () {
         expect(view.position()).toEqualRect({left: 300, top: 300, bottom: 300, right: 300});
       });
     })
-
   });
 
   describe('position()', function () {

@@ -1,7 +1,7 @@
 Superview.Rect = (function () {
 
   Rect = function (rect) {
-    extend(this).withObject(rect);
+    Object.extend(this).withObject(rect);
   }
 
   Rect.prototype = {

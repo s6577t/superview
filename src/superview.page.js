@@ -1,7 +1,7 @@
 Superview.Page = (function () {
   
   var Page = function () {
-    extend(this).mixin(Superview);
+    Object.extend(this).mixin(Superview);
   };
   
   Page.prototype = {

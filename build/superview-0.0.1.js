@@ -21,7 +21,7 @@ var KeyCodes = {
     this.onResized().throttle(50);
     this.onMoved().throttle(50);
     
-    extend(this).with({
+    Object.extend(this).with({
       hasViewMixin: true,
       _controller: null,
       _parent: null,
@@ -526,7 +526,7 @@ var KeyCodes = {
 Superview.Page = (function () {
   
   var Page = function () {
-    extend(this).mixin(Superview);
+    Object.extend(this).mixin(Superview);
   };
   
   Page.prototype = {

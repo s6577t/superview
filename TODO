@@ -1,6 +1,19 @@
+
+RESTART
+
+> check all functionality with visual specs
+
+> remove deepCopy and shallowCopy - use bare jQuery $.extend
+> return a COPY of restrictions from Superview#restrictions
+
+?> change to use api like Superview.extend({}) rather than MyView() { Object.extend(this).withMixin(Superview)}
+
+
 1:
   
   c: finish impl superview.restrictions INCL additional resize() AND moveTo() specs to prevent resizing and moving beyond restritions
+
+-> remove the dependency on z() - it's not worth it for just one simple use case
 
 -> VISUAL_SPECS for constraints
 
@@ -15,7 +28,7 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 
 2: padding and border css intercepts -> trigger event
 3: refactor anchoring and fix fractional positioning bug (if it exists?)
-4: detect and refuse cyclic anchoring
+?4: detect and refuse cyclic anchoring
 5: ancestor anchoring behaviour revision
 6: anchorBoundsTo handling
 7: fix draggable with padding/border bug

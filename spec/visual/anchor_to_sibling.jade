@@ -1,7 +1,7 @@
-<script type="text/javascript" charset="utf-8">
+script
   
   var AnchorToSibling = function () {
-    extend(this).mixin(Superview.Page);
+    Object.extend(this).mixin(Superview.Page);
   }
   
   AnchorToSibling.prototype = {
@@ -63,4 +63,3 @@
   jQuery(function () {
     new AnchorToSibling().initialize();
   })
-</script>

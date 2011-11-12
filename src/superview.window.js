@@ -14,7 +14,7 @@ Superview.Window = (function () {
     });
   }
   
-  override(Window).withObject({
+  Object.override(Window).withObject({
     addTo: function (base) {
       throw new Error('cannot set the parent of the window');
     },
@@ -22,8 +22,8 @@ Superview.Window = (function () {
       throw new Error('cannot remove the window');
     }
   });
-  
-  extend(Window).withObject({
+
+  Object.extend(Window).withObject({
     install: function () {
       var body = z.body(),
           w = z.window();

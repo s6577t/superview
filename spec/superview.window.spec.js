@@ -35,12 +35,12 @@ xdescribe('superview.window', function () {
     it('should raise an error on addTo()', function () {
       expect(function () {
         w.addTo(new Superview())
-      }).toThrowAnError();
+      }).toThrow();
     });
     it('should raise an error on remove()', function () {
       expect(function () {
         w.remove()
-      }).toThrowAnError();
+      }).toThrow();
     });
   });
 });

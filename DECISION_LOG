@@ -17,3 +17,6 @@ VIEW: display data, emit events such that controllers can effectively receive an
 MODEL: hold data and logic, emit events such that controllers can effectively receive and update the view
 
 
+A Superview.extend({}) syntax is not used because it doesn't allow for object member to be defined in the constructor
+
+

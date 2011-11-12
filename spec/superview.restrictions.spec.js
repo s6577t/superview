@@ -135,7 +135,7 @@ describe('superview.restrictions', function () {
             height: 199
           }
         })
-      }).toThrowAnError();
+      }).toThrow();
       
       expect(function () {
         view.resize({width: 200});
@@ -147,7 +147,7 @@ describe('superview.restrictions', function () {
             right: 600
           }
         })
-      }).toThrowAnError();
+      }).toThrow();
 
       expect(function () {
         view.restrictTo({
@@ -158,7 +158,7 @@ describe('superview.restrictions', function () {
             left: 400
           }
         })
-      }).toThrowAnError();
+      }).toThrow();
     });
 
     it('should accept an empty object as default limits', function () {

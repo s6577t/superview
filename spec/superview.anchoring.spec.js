@@ -45,7 +45,7 @@ xdescribe("anchor layout behaviour", function () {
                 width: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -53,7 +53,7 @@ xdescribe("anchor layout behaviour", function () {
                 width: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {
@@ -149,7 +149,7 @@ xdescribe("anchor layout behaviour", function () {
                 height: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -157,7 +157,7 @@ xdescribe("anchor layout behaviour", function () {
                 height: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {
@@ -278,7 +278,7 @@ xdescribe("anchor layout behaviour", function () {
                 top: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -286,7 +286,7 @@ xdescribe("anchor layout behaviour", function () {
                 top: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {
@@ -392,7 +392,7 @@ xdescribe("anchor layout behaviour", function () {
                 bottom: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -400,7 +400,7 @@ xdescribe("anchor layout behaviour", function () {
                 bottom: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {
@@ -505,7 +505,7 @@ xdescribe("anchor layout behaviour", function () {
                 left: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -513,7 +513,7 @@ xdescribe("anchor layout behaviour", function () {
                 left: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {
@@ -620,7 +620,7 @@ xdescribe("anchor layout behaviour", function () {
                 right: "23"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
           it('should throw an error if it does not end with a number', function () {
             var fn = function () {
@@ -628,7 +628,7 @@ xdescribe("anchor layout behaviour", function () {
                 right: "+23meow"
               });
             }
-            expect(fn).toThrowAnError();
+            expect(fn).toThrow();
           })
         })
         it('should anchor positive offsets correctly', function() {

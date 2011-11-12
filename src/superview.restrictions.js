@@ -1,14 +1,13 @@
 Superview.Restrictions = (function () {
 
   Restrictions = function (restrictions) {
-    extend(this).withObject(restrictions);
+    Object.extend(this).withObject(restrictions);
     this.minimum = new Superview.Rect(restrictions.minimum);
     this.maximum = new Superview.Rect(restrictions.maximum);
   }
 
   Restrictions.prototype = {
     flatten: function () {
-
       var flat = {};
 
       flat.minimum = this.minimum.flatten();

@@ -4,6 +4,7 @@
   licence: 'licence.txt',
 
   javascripts: {
+    src:  ['superview.js', '*'],
     spec: ['env/jasmine.js', 'env/jasmine-html.js', '*']
   }
 }
