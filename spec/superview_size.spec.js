@@ -11,7 +11,7 @@ describe('superview.size', function () {
       view.resize({width: 100, height: 100});
 
       var size0 = view.size();
-      
+
       view.css('border', 'solid 1px red');
 
       var size1 = view.size();
@@ -64,9 +64,9 @@ describe('superview.size', function () {
       view.$().css({
         border: 'solid 5px red'
       });
-      
+
       view.resize({width: 123, height: 456});
-      
+
       expect(view.$().width()).toEqual(113);
       expect(view.$().height()).toEqual(446);
 
@@ -100,7 +100,18 @@ describe('superview.size', function () {
       expect(view.onResized().emit).not.toHaveBeenCalled();
     });
 
+    it('should not fire the restriction callback if the resize is not resitrcted', function () {
+      var called = false;
+
+      view.resize({width: 301}, function () {
+        called = true;
+      });
+
+      expect(called).toEqual(false);
+    })
+
     describe('when the size is restricted', function () {
+
       it('should not set the dimensions to greater that the max', function () {
         view.restrictTo({
           maximum: {
@@ -153,8 +164,19 @@ describe('superview.size', function () {
 
         expect(view.size()).toEqualRect({width: 300, height: 300});
       });
-    })
 
+      it('should callback if the resize is limited', function () {
+
+        var called = false;
+
+        view.restrictTo({maximum: {width: 300}});
+        view.resize({width: 301}, function () {
+          called = true;
+        });
+
+        expect(called).toEqual(true);
+      });
+    });
   });
 
   describe('size()', function () {
@@ -178,18 +200,18 @@ describe('superview.size', function () {
       expect(view.size()).toEqualRect({width: 100, height: 200});
     });
   });
-  
+
   describe('borderMetrics()', function () {
-    
+
     it('should return the correct values', function () {
-      
+
       view.$().css({
         borderTop: 1,
         borderBottom: 2,
         borderLeft: 3,
         borderRight: 4
       });
-      
+
       expect(view.borderMetrics()).toEqualRect({
         top: 1,
         left: 3,

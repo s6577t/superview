@@ -21,7 +21,7 @@ describe('superview.restrictions', function () {
             }
           })
         });
-        
+
         return equal;
       }
     })
@@ -33,16 +33,22 @@ describe('superview.restrictions', function () {
       expect(view.restrictions()).toEqualRestrictions({});
     })
 
+    it('should interpret null as no restrictions', function () {
+      view.restrictTo({maximum:{width: 30}});
+      view.restrictTo(null);
+      expect(view.restrictions().maximum.width).not.toEqual(30);
+    })
+
     it("should be chainable", function() {
       var r = view.restrictTo({});
       expect(r).toBe(view);
-    });  
+    });
 
     it('should update the current size when the minimum size is set', function () {
       view.resize({width: 0, height: 0});
-      
+
       spyOn(view, 'resize').andCallThrough();
-      
+
       view.restrictTo({
         minimum: {
           width: 30,
@@ -56,9 +62,9 @@ describe('superview.restrictions', function () {
 
     it('should update the current size when the maximum size is set', function () {
       view.resize({width: 500, height: 500});
-      
+
       spyOn(view, 'resize').andCallThrough();
-      
+
       view.restrictTo({
         maximum: {
           width: 100,
@@ -123,7 +129,7 @@ describe('superview.restrictions', function () {
     });
 
     it("should throw an error if a minimum is greater than a corresponding maximum", function() {
-      
+
       expect(function () {
         view.restrictTo({
           minimum: {
@@ -136,7 +142,7 @@ describe('superview.restrictions', function () {
           }
         })
       }).toThrow();
-      
+
       expect(function () {
         view.resize({width: 200});
         view.restrictTo({
@@ -168,7 +174,7 @@ describe('superview.restrictions', function () {
         height: 0
       }, maximum:{}});
     });
-    
+
     it("should default negative width/height values to zero", function() {
       view.restrictTo({
         minimum: {
@@ -237,19 +243,29 @@ describe('superview.restrictions', function () {
       }, maximum:{}});
     });
 
+    it("should not return the internally maintained object", function() {
+
+      var internal = view._restrictions;
+      var rtn = view.restrictions();
+
+      expect(internal).not.toBe(rtn);
+      expect(internal.minimum).not.toBe(rtn.minimum);
+      expect(internal.maximum).not.toBe(rtn.maximum);
+    });
+
     it("should translate restrictions to all four edges", function() {
       view.resize({
         width: 100,
         height: 100
       });
-      
+
       view.restrictTo({
         minimum: {
           bottom: 430,
           right: 320
         }
       });
-      
+
       expect(view.restrictions()).toEqualRestrictions({
         minimum: {
           top: 330,
@@ -258,14 +274,14 @@ describe('superview.restrictions', function () {
           right: 320
         }
       });
-      
+
       view.restrictTo({
         maximum: {
           top: 430,
           left: 320
         }
       });
-      
+
       expect(view.restrictions()).toEqualRestrictions({
         maximum: {
           top: 430,
@@ -275,7 +291,7 @@ describe('superview.restrictions', function () {
         }
       });
     });
-    
+
     it("should return the current size limit for the view", function () {
       view.restrictTo({
         maximum:{

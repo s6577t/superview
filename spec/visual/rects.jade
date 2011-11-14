@@ -1,9 +1,9 @@
-<script type="text/javascript" charset="utf-8">
-  
+script
+
   var RectsPage = function () {
     Object.extend(this).mixin(Superview.Page);
   }
-  
+
   RectsPage.prototype = {
     render: function () {
       var box1 = new Superview().render().addTo(this);
@@ -11,24 +11,23 @@
         backgroundColor: 'yellow',
         border: 'solid 5px red'
       });
-      
+
       var box2 = new Superview().render().addTo(this);
       box2.resize({width: 300, height: 300}).moveTo({top: 450, left: 50}).$().css({
         backgroundColor: 'green',
         border: 'solid 5px blue'
       });;
-      
+
       window.box1 = box1;
       window.box2 = box2;
-      
+
       return this
-    },
-   bind( function () {
+    }
+    , bind: function () {
       return this.fitWindow();
     }
   }
-  
+
   jQuery(function () {
     new RectsPage().initialize();
   })
-</script>

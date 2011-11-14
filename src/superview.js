@@ -39,7 +39,7 @@ Superview = (function ($) {
         left: 0
       },
       _vid: viewIdSpool++,
-      _zElem: z.div().css({
+      _zElem: jQuery('<div>').css({
         overflow: 'hidden',
         display: 'inline-block',
         position: 'absolute',
@@ -230,12 +230,12 @@ Superview = (function ($) {
 
     borderMetrics: function () {
       var self = this;
-      var z = this.$();
+      var thi$ = this.$();
       var m = {
-        top:    parseFloat(z.css('borderTopWidth'), 10) || 0 ,
-        right:  parseFloat(z.css('borderRightWidth'), 10) || 0,
-        bottom: parseFloat(z.css('borderBottomWidth'), 10) || 0,
-        left:   parseFloat(z.css('borderLeftWidth'), 10) || 0
+        top:    parseFloat(thi$.css('borderTopWidth'), 10) || 0 ,
+        right:  parseFloat(thi$.css('borderRightWidth'), 10) || 0,
+        bottom: parseFloat(thi$.css('borderBottomWidth'), 10) || 0,
+        left:   parseFloat(thi$.css('borderLeftWidth'), 10) || 0
       }
 
       m.width = m.right + m.left;
@@ -244,24 +244,27 @@ Superview = (function ($) {
       return m;
     },
 
-    resize: function (newSize) {
+    resize: function (newSize, restrictionCallback) {
 
       newSize = new Superview.Rect(newSize);
 
-      var resized = false,
-      thi$ = this.$(),
-      size = this._size,
-      restrictions = new Superview.Restrictions(this.restrictions()),
-      borderMetrics = this.borderMetrics();
-
+      var resized     = false
+      , restricted    = false
+      , thi$          = this.$()
+      , size          = this._size
+      , restrictions  = new Superview.Restrictions(this.restrictions())
+      , borderMetrics = this.borderMetrics();
+      
       if (newSize.hasWidth()) {
 
         if (restrictions.minimum.hasWidth() && (newSize.width < restrictions.minimum.width)) {
           newSize.width = restrictions.minimum.width;
+          restricted = true;
         }
 
         if (restrictions.maximum.hasWidth() && (newSize.width > restrictions.maximum.width)) {
           newSize.width = restrictions.maximum.width;
+          restricted = true;
         }
 
         if (newSize.width !== size.width) {
@@ -275,10 +278,12 @@ Superview = (function ($) {
 
         if (restrictions.minimum.hasHeight() && (newSize.height < restrictions.minimum.height)) {
           newSize.height = restrictions.minimum.height;
+          restricted = true;
         }
 
         if (restrictions.maximum.hasHeight() && (newSize.height > restrictions.maximum.height)) {
           newSize.height = restrictions.maximum.height;
+          restricted = true;
         }
 
         if (newSize.height !== size.height) {
@@ -291,11 +296,17 @@ Superview = (function ($) {
       if (resized) {
         this.onResized().emit(this);
       }
+      
+      if (restricted && (typeof restrictionCallback === 'function')) {
+        restrictionCallback();
+      }
 
       return this;
     },
 
     restrictTo: function (restrictions) {
+      if (restrictions === null) restrictions = {};
+
       var self = this;
       var size = this.size();
       var position = this.position();
@@ -391,14 +402,15 @@ Superview = (function ($) {
       return this;
     },
     restrictions: function () {
-      return  this._restrictions;
+      return jQuery.extend(true, {}, this._restrictions);
     },
 
-    moveTo: function (newPosition) {
+    moveTo: function (newPosition, restrictionCallback) {
 
       newPosition = new Superview.Rect(newPosition);
 
       var moved = false,
+      restricted = false,
       thi$ = this.$(),
       position = this._position,
       size = this.size(),
@@ -416,10 +428,12 @@ Superview = (function ($) {
 
         if (restrictions.minimum.hasLeft() && (newPosition.left < restrictions.minimum.left)) {
           newPosition.left = restrictions.minimum.left;
+          restricted = true;
         }
 
         if (restrictions.maximum.hasLeft() && (newPosition.left > restrictions.maximum.left)) {
           newPosition.left = restrictions.maximum.left;
+          restricted = true;
         }
 
         if (newPosition.left != position.left) {
@@ -433,10 +447,12 @@ Superview = (function ($) {
 
         if (restrictions.minimum.hasTop() && (newPosition.top < restrictions.minimum.top)) {
           newPosition.top = restrictions.minimum.top;
+          restricted = true;
         }
 
         if (restrictions.maximum.hasTop() && (newPosition.top > restrictions.maximum.top)) {
           newPosition.top = restrictions.maximum.top;
+          restricted = true;
         }
 
         if (newPosition.top != position.top) {
@@ -452,6 +468,10 @@ Superview = (function ($) {
         position.bottom = position.top + size.height;
 
         this.onMoved().emit(this);
+      }
+      
+      if (restricted && (typeof restrictionCallback === 'function')) {
+        restrictionCallback();
       }
 
       return this;
@@ -635,7 +655,7 @@ Superview = (function ($) {
     */
     draggable: function () {
 
-      var self = this, thiz = this.$(), w = z.window();
+      var self = this, thi$ = this.$(), w = jQuery(window);
 
       // for smoother dragging action
       self.onMoved().throttle(5);
@@ -651,7 +671,7 @@ Superview = (function ($) {
         prev = event;
       }
 
-      thiz.bind('mousedown', function (event) {
+      thi$.bind('mousedown', function (event) {
 
         prev = event;
 
@@ -662,6 +682,6 @@ Superview = (function ($) {
       })
     }
   }
-  
+
   return Superview;
 })(jQuery)

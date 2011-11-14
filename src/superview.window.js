@@ -3,8 +3,8 @@ Superview.Window = (function () {
   var Window = new Superview().render();
 
   function fitToWindow () {
-    var w = z.window(),
-        body = z.body();
+    var w = jQuery(window),
+        body = jQuery('body');
     
     body.width(w.width());
     body.height(w.height());
@@ -25,8 +25,8 @@ Superview.Window = (function () {
 
   Object.extend(Window).withObject({
     install: function () {
-      var body = z.body(),
-          w = z.window();
+      var body = jQuery('body'),
+          w = jQuery(window);
       
       body.addClass('superview').css({
         margin: 0,
@@ -43,7 +43,7 @@ Superview.Window = (function () {
     },
     // only use this for testing
     _uninstall: function () {
-      z.body().removeClass('superview').css({
+      jQuery('body').removeClass('superview').css({
         margin: 0,
         padding: 0,
         width: '100%',
@@ -51,7 +51,7 @@ Superview.Window = (function () {
         overflow: 'scroll'
       });
       Window.$().detach();
-      z.window().unbind('resize', fitToWindow);
+      jQuery('window').unbind('resize', fitToWindow);
     }
   });
   

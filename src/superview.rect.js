@@ -25,14 +25,14 @@ Superview.Rect = (function () {
   ['Top', 'Right', 'Bottom', 'Left'].forEach(function (edge) {
     Rect.prototype['has' + edge] = function () {
       var edgeValue = this[edge.toLowerCase()];
-      return (typeof edgeValue === 'number') && edgeValue !== NaN && edgeValue !== Infinity
+      return (typeof edgeValue === 'number') && !isNaN(edgeValue) && edgeValue !== Infinity
     }
   });
 
   ['Width', 'Height'].forEach(function (dimension) {
     Rect.prototype['has' + dimension] = function () {
       var dimensionValue = this[dimension.toLowerCase()];
-      return (typeof dimensionValue === 'number') && dimensionValue !== NaN && dimensionValue !== Infinity && dimensionValue >= 0;
+      return (typeof dimensionValue === 'number') && !isNaN(dimensionValue) && dimensionValue !== Infinity && dimensionValue >= 0;
     }
   });
 

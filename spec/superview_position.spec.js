@@ -62,7 +62,17 @@ describe('superview.position', function () {
         left: 150
       });
     });
-
+    
+    it('should not fire the restriction callback if the reposition was not limited', function () {
+      var called = false;
+      
+      view.moveTo({top: 301}, function () {
+        called = true;
+      });
+      
+      expect(called).toEqual(false);
+    })
+    
     describe('when the position is restricted', function () {
       it('should not set the position to greater that the max', function () {
         view.restrictTo({
@@ -119,6 +129,16 @@ describe('superview.position', function () {
         view.moveTo({left: 300, top: 300});
 
         expect(view.position()).toEqualRect({left: 300, top: 300, bottom: 300, right: 300});
+      });
+      
+      it('it should callback', function () {
+        var called = false;
+        view.restrictTo({maximum: {left: 300}});
+        view.moveTo({left: 301}, function () {
+          called = true;
+        });
+        
+        expect(called).toEqual(true);
       });
     })
   });

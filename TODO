@@ -1,8 +1,4 @@
 
-RESTART
-
-> check all functionality with visual specs
-
 > remove deepCopy and shallowCopy - use bare jQuery $.extend
 > return a COPY of restrictions from Superview#restrictions
 
@@ -52,4 +48,5 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 
 >: run tests and view visuals in Safari and Firefox and on the iPad
 
+> review controller setter/getter
   
