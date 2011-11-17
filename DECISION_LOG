@@ -1,11 +1,11 @@
-1) JQUERY is a dependency for supermodel
+1) JQUERY is a dependency for superview
 	(standard!)
 	
-2) NO CSS by default
+2) Less CSS by default
 * CSS was supposed to separate presentation from content (HTML)
 * but now, we do layout in the javascript and most importantly...
 * views ARE our separation from content.
-* we've gone beyond static documents and need more powerful technologies (hence SCSS)
+* we've gone beyond static documents and need more powerful technologies (hence SASS)
 
 3) Every view can have a controller. Views create and manage subviews. A view can set itself a controller
 which would be responsible for handling view events and mapping changes to the model. Views know about subviews,

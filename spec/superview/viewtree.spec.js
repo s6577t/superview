@@ -1,7 +1,7 @@
 describe("view tree related behaviour", function () {
   
   it('is a root when it has no parent', function () {
-    var root = new View1
+    var root = new Superview
     expect(root.isRoot()).toBeTruthy()
   })
   
@@ -13,14 +13,14 @@ describe("view tree related behaviour", function () {
   })
   
   it('is not a root when it has a parent', function () {
-    var notRoot = new View1().addTo(new View1())
+    var notRoot = new Superview().addTo(new Superview())
     expect(notRoot.isRoot()).toBeFalsy();
   })
 
   describe('adding subviews', function () {
     it('should not add a subview more than once', function () {
-      var v1 = new View1;
-      var v2 = new View1;
+      var v1 = new Superview;
+      var v2 = new Superview;
 
       (10).times(function () {
         try {
@@ -34,8 +34,8 @@ describe("view tree related behaviour", function () {
     });
 
     it('sets the parent when adding a subview', function () {
-      var parent = new View1,
-      child = new View1
+      var parent = new Superview,
+      child = new Superview
 
       parent.add(child)
 
@@ -43,8 +43,8 @@ describe("view tree related behaviour", function () {
     })
 
     it('should emit an onSubviewAdded event with child,parent arguments', function () {
-      var parent = new View1,
-      child = new View1
+      var parent = new Superview,
+      child = new Superview
 
       var called = [];
 
@@ -59,8 +59,8 @@ describe("view tree related behaviour", function () {
     })
 
     it('should make the subview available in subviews()', function () {
-      var parent = new View1,
-          child = new View1;
+      var parent = new Superview,
+          child = new Superview;
 
       parent.add(child);
 
@@ -68,9 +68,9 @@ describe("view tree related behaviour", function () {
     });
     
     it('should add all subviews passed to add', function () {
-      var parent = new View1,
-          child = new View1,
-          child2 = new View1;
+      var parent = new Superview,
+          child = new Superview,
+          child2 = new Superview;
       
       parent.add(child, child2)
       
@@ -146,14 +146,14 @@ describe("view tree related behaviour", function () {
   describe('when getting subviews', function () {
 
     it('returns an array that is a COPY of the internally managed array', function () {
-      var parent = new View1, child = new View1
+      var parent = new Superview, child = new Superview
       parent.add(child)
       expect(parent.subviews()).not.toBe(parent._subviews);
       expect(parent.subviews()).not.toBe(parent.subviews());
     });
 
     it('returns an array containing all subviews', function () {
-      var parent = new View1, child = new View1
+      var parent = new Superview, child = new Superview
       parent.add(child)
       expect(parent.subviews()).not.toBe(parent._subviews);
       expect(parent.subviews()).not.toBe(parent.subviews());
@@ -191,17 +191,17 @@ describe("view tree related behaviour", function () {
     })
     
     it('should not contain subviews removed with remove', function () {
-      var v1 = new View1;
-      var v2 = new View1;
+      var v1 = new Superview;
+      var v2 = new Superview;
       v1.add(v2);
       v1.remove(v2);
       expect(v1.subviews().contains(v2)).toBeFalsy();
     });
 
     it('should not contain any subviews after removeAll is called', function () {
-      var v1 = new View1;
+      var v1 = new Superview;
       
-      v1.add(new View1).add(new View1);
+      v1.add(new Superview).add(new Superview);
       v1.removeAll();
       expect(v1.subviews().isEmpty()).toBeTruthy();
     });

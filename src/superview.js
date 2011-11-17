@@ -53,23 +53,23 @@ Superview = (function ($) {
     setController: function (c) {
       this._controller = c;
       return this;
-    },
-    getController: function () {
+    }
+    , getController: function () {
       return this._controller;
-    },
-    vid: function() {
+    }
+    , vid: function() {
       return this._vid;
-    },
+    }
     /*
     DOM related members
     */
-    elem: function () {
+    , elem: function () {
       return this._zElem.elem();
-    },
-    $: function () {
+    }
+    , $: function () {
       return this._zElem;
-    },
-    css: function () {
+    }
+    , css: function () {
 
       var getting = (arguments.length === 1) && (typeof arguments[0] === 'string');
       var thi$ = this.$();
@@ -103,11 +103,11 @@ Superview = (function ($) {
 
         return this;
       }
-    },
+    }
     /*
     View tree members
     */
-    add: function () {
+    , add: function () {
       var subviewsToAdd = $.isArray(arguments[0]) ? arguments[0] : Array.toArray(arguments);
       var self = this;
       subviewsToAdd.forEach(function (view) {
@@ -119,17 +119,17 @@ Superview = (function ($) {
         view.onAdded().emit(view, self);
       });
       return this;
-    },
+    }
     // pass null to set as root view
-    addTo: function (parent) {
+    , addTo: function (parent) {
       if (!parent || this._parent) return this.remove();
       parent.add(this);
       return this;
-    },
-    parent: function () {
+    }
+    , parent: function () {
       return this._parent;
-    },
-    ancestors: function () {
+    }
+    , ancestors: function () {
       var ancestors = [];
       var current = this.parent();
       while (current) {
@@ -137,20 +137,20 @@ Superview = (function ($) {
         current = current.parent()
       }
       return ancestors;
-    },
+    }
 
-    isRoot: function () {
+    , isRoot: function () {
       return !this.parent();
-    },
-    root: function () {
+    }
+    , root: function () {
       var v = this;
       while (!v.isRoot()) {
         v = v.parent();
       }
       return v;
-    },
+    }
     // () to remove from parent, an array and any number of arguments to remove each of them
-    remove: function () {
+    , remove: function () {
 
       var self = this;
 
@@ -187,11 +187,11 @@ Superview = (function ($) {
 
       deventify(this);
       return this;
-    },
-    removeAll: function () {
+    }
+    , removeAll: function () {
       return this.remove(this.subviews());
-    },
-    subviews: function (recur) {
+    }
+    , subviews: function (recur) {
       var subs = Object.values(this._subviews);
 
       if (recur) {
@@ -201,9 +201,9 @@ Superview = (function ($) {
       }
 
       return subs;
-    },
+    }
 
-    initialize: function () {
+    , initialize: function () {
       var vs = this.subviews(true);
       vs.unshift(this);
       vs.forEach(function (view) {
@@ -211,24 +211,24 @@ Superview = (function ($) {
         view.populate()
       });
       return this;
-    },
-    render: function () {
+    }
+    , render: function () {
       // NOOP default. override me!
       return this
-    },
-    bind: function () {
+    }
+    , bind: function () {
       // NOOP. Override me!
       return this;
-    },
-    populate: function () {
+    }
+    , populate: function () {
       // NOOP. Override me!
       return this;
-    },
-    update: function () {
+    }
+    , update: function () {
       return this.populate();
-    },
+    }
 
-    borderMetrics: function () {
+    , borderMetrics: function () {
       var self = this;
       var thi$ = this.$();
       var m = {
@@ -242,9 +242,9 @@ Superview = (function ($) {
       m.height = m.top + m.bottom;
 
       return m;
-    },
+    }
 
-    resize: function (newSize, restrictionCallback) {
+    , resize: function (newSize, restrictionCallback) {
 
       newSize = new Superview.Rect(newSize);
 
@@ -254,7 +254,7 @@ Superview = (function ($) {
       , size          = this._size
       , restrictions  = new Superview.Restrictions(this.restrictions())
       , borderMetrics = this.borderMetrics();
-      
+
       if (newSize.hasWidth()) {
 
         if (restrictions.minimum.hasWidth() && (newSize.width < restrictions.minimum.width)) {
@@ -296,15 +296,86 @@ Superview = (function ($) {
       if (resized) {
         this.onResized().emit(this);
       }
-      
+
       if (restricted && (typeof restrictionCallback === 'function')) {
         restrictionCallback();
       }
 
       return this;
-    },
+    }
+    , moveTo: function (newPosition, restrictionCallback) {
 
-    restrictTo: function (restrictions) {
+      newPosition = new Superview.Rect(newPosition);
+
+      var moved = false,
+      restricted = false,
+      thi$ = this.$(),
+      position = this._position,
+      size = this.size(),
+      restrictions = new Superview.Restrictions(this.restrictions());
+
+      if (newPosition.hasRight() && !newPosition.hasLeft()) {
+        newPosition.left = newPosition.right - size.width;
+      }
+
+      if (newPosition.hasBottom() && !newPosition.hasTop()) {
+        newPosition.top = newPosition.bottom - size.height;
+      }
+
+      if (newPosition.hasLeft()) {
+
+        if (restrictions.minimum.hasLeft() && (newPosition.left < restrictions.minimum.left)) {
+          newPosition.left = restrictions.minimum.left;
+          restricted = true;
+        }
+
+        if (restrictions.maximum.hasLeft() && (newPosition.left > restrictions.maximum.left)) {
+          newPosition.left = restrictions.maximum.left;
+          restricted = true;
+        }
+
+        if (newPosition.left != position.left) {
+          moved = true;
+          position.left = newPosition.left;
+          thi$.css('left', position.left);
+        }
+      }
+
+      if (newPosition.hasTop()) {
+
+        if (restrictions.minimum.hasTop() && (newPosition.top < restrictions.minimum.top)) {
+          newPosition.top = restrictions.minimum.top;
+          restricted = true;
+        }
+
+        if (restrictions.maximum.hasTop() && (newPosition.top > restrictions.maximum.top)) {
+          newPosition.top = restrictions.maximum.top;
+          restricted = true;
+        }
+
+        if (newPosition.top != position.top) {
+          moved = true;
+          position.top = newPosition.top;
+          thi$.css('top', position.top);
+        }
+      }
+
+      if (moved) {
+
+        position.right = position.left + size.width;
+        position.bottom = position.top + size.height;
+
+        this.onMoved().emit(this);
+      }
+
+      if (restricted && (typeof restrictionCallback === 'function')) {
+        restrictionCallback();
+      }
+
+      return this;
+    }
+
+    , restrictTo: function (restrictions) {
       if (restrictions === null) restrictions = {};
 
       var self = this;
@@ -400,91 +471,31 @@ Superview = (function ($) {
 
       this._restrictions = restrictions.flatten();
       return this;
-    },
-    restrictions: function () {
+    }
+    , restrictions: function () {
       return jQuery.extend(true, {}, this._restrictions);
-    },
+    }
 
-    moveTo: function (newPosition, restrictionCallback) {
-
-      newPosition = new Superview.Rect(newPosition);
-
-      var moved = false,
-      restricted = false,
-      thi$ = this.$(),
-      position = this._position,
-      size = this.size(),
-      restrictions = new Superview.Restrictions(this.restrictions());
-
-      if (newPosition.hasRight() && !newPosition.hasLeft()) {
-        newPosition.left = newPosition.right - size.width;
-      }
-
-      if (newPosition.hasBottom() && !newPosition.hasTop()) {
-        newPosition.top = newPosition.bottom - size.height;
-      }
-
-      if (newPosition.hasLeft()) {
-
-        if (restrictions.minimum.hasLeft() && (newPosition.left < restrictions.minimum.left)) {
-          newPosition.left = restrictions.minimum.left;
-          restricted = true;
-        }
-
-        if (restrictions.maximum.hasLeft() && (newPosition.left > restrictions.maximum.left)) {
-          newPosition.left = restrictions.maximum.left;
-          restricted = true;
-        }
-
-        if (newPosition.left != position.left) {
-          moved = true;
-          position.left = newPosition.left;
-          thi$.css('left', position.left);
-        }
-      }
-
-      if (newPosition.hasTop()) {
-
-        if (restrictions.minimum.hasTop() && (newPosition.top < restrictions.minimum.top)) {
-          newPosition.top = restrictions.minimum.top;
-          restricted = true;
-        }
-
-        if (restrictions.maximum.hasTop() && (newPosition.top > restrictions.maximum.top)) {
-          newPosition.top = restrictions.maximum.top;
-          restricted = true;
-        }
-
-        if (newPosition.top != position.top) {
-          moved = true;
-          position.top = newPosition.top;
-          thi$.css('top', position.top);
-        }
-      }
-
-      if (moved) {
-
-        position.right = position.left + size.width;
-        position.bottom = position.top + size.height;
-
-        this.onMoved().emit(this);
-      }
-      
-      if (restricted && (typeof restrictionCallback === 'function')) {
-        restrictionCallback();
-      }
-
-      return this;
-    },
-
-    size: function () {
+    , size: function () {
       return Object.shallowCopy(this._size);
-    },
-    position: function () {
+    }
+    , position: function () {
       return Object.shallowCopy(this._position);
-    },
+    }
 
-    anchorTo: function (otherView, anchoring) {
+    , contentArea: function () {
+      return this._contentArea = this._contentArea || {
+        // resize, moveTo, size, position, restrictTo, restrictions
+        resize: function (newSize, restrictionCallback) {
+          // adjust the newSize by taking off border width etc. and relay to outer
+        }
+        , moveTo: function (newPosition, restrictionCallback) {
+          // 
+        }
+      };
+    }
+
+    , anchorTo: function (otherView, anchoring) {
       var self = this;
 
       if (self.anchoring()) self.deanchor();
@@ -619,14 +630,14 @@ Superview = (function ($) {
       self._anchoringMoveHandler(otherView, otherView.rect(), otherView.outerRect());
 
       return this;
-    },
-    anchorToParent: function (anchoring) {
+    }
+    , anchorToParent: function (anchoring) {
       return this.isRoot() ? this : this.anchorTo(this.parent(), anchoring);
-    },
-    anchoring: function () {
+    }
+    , anchoring: function () {
       return this._anchoring;
-    },
-    deanchor: function () {
+    }
+    , deanchor: function () {
 
       var self = this;
       var anchoring = this.anchoring();
@@ -647,13 +658,9 @@ Superview = (function ($) {
       }
 
       return this;
-    },
+    }
 
-    /*
-    deanchor listeners and nullify local variable
-    edging when resizable
-    */
-    draggable: function () {
+    , draggable: function () {
 
       var self = this, thi$ = this.$(), w = jQuery(window);
 

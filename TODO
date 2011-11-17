@@ -1,9 +1,33 @@
+specs have been abstracted where possible, review all specs and write content area idiosyncratic specs as well as addtional integrations specs for:
+> contentArea event emissions in response to the resizing of the boundary box and vice-versa
+> contentArea event emissions for border size changes (which do not cause the boundary box to resize).
 
-> remove deepCopy and shallowCopy - use bare jQuery $.extend
-> return a COPY of restrictions from Superview#restrictions
+> check all method return values are specced, resize() wasn't
 
-?> change to use api like Superview.extend({}) rather than MyView() { Object.extend(this).withMixin(Superview)}
+THEN: introduce abstract box specs onto content area
 
+contentArea should have its own onResized event which is emitted when the border size is changed (and when the boundary box is resized)
+
+SPEC that the contentArea onResized/onMoved events are emitted when the boundary box is resize/moved and vice-versa
+
+CSS filtering for position ?! spec + implement
+
+
+
+
+
+
+
+
+
+
+
+
+
+contentArea should have its own onMoved event which is emitted when the border size is changed (and when the boundary box is repositioned)
+
+
+> What happens when I resize a box smaller than its border allows?
 
 1:
   
@@ -23,11 +47,13 @@ put restrictions() functionality in superview.restrictions and likewise for simi
 modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews have it)
 
 2: padding and border css intercepts -> trigger event
-3: refactor anchoring and fix fractional positioning bug (if it exists?)
+3: refactor anchoring and fix fractional positioning bug (if it still exists?)
 ?4: detect and refuse cyclic anchoring
 5: ancestor anchoring behaviour revision
-6: anchorBoundsTo handling
+6: anchorRestrictionTo handling - if it's quick to do
 7: fix draggable with padding/border bug
+
+> anchorTo restriction callback
 
 >: if I bind a box to the right of something and then resize it, it should still stick to the right
         > visual spec
@@ -35,6 +61,8 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 >: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
         > visual spec
         > spec
+
+?> change to use api like Superview.extend({}) rather than MyView() { Object.extend(this).withMixin(Superview)}
 
 >: dragging with a border sent the position F**king crazy
 
@@ -48,5 +76,9 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 
 >: run tests and view visuals in Safari and Firefox and on the iPad
 
+> calls to css() for top,left,right,bottom,width,height should result in a call to resize/moveTo
+> review and document initialization protocol
+> add presenter getter/setter
 > review controller setter/getter
+> filter CSS position to only allow absolute, and relative IFF the superview is a root. WHAT ABOUT position: fixed?
   

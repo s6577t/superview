@@ -1,4 +1,4 @@
-xdescribe('superview.window', function () {
+xdescribe('Superview.Window', function () {
   var w;
   beforeEach(function() {
     w = Superview.Window;
@@ -6,7 +6,7 @@ xdescribe('superview.window', function () {
   afterEach(function () {
     w._uninstall();
   })
-  
+
   describe('when installed', function () {
     beforeEach(function () {
       w.install();
@@ -30,7 +30,7 @@ xdescribe('superview.window', function () {
       })
     })
   });
-  
+
   describe('not supported functions', function () {
     it('should raise an error on addTo()', function () {
       expect(function () {

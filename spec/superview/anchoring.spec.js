@@ -913,7 +913,7 @@ xdescribe("anchor layout behaviour", function () {
 
   describe("deanchor()", function () {
     it('should be chainable', function () {
-      var v = new View1;
+      var v = new Superview;
       expect(v.deanchor()).toBe(v);
     })
     it('should be inneffectual if there is no bound view', function () {
