@@ -25,7 +25,7 @@ function boxSpecs (newBoxFunction) {
 
     describe('resize()', function () {
 
-      it('should emit an onResized event with itself', function () {
+      it('should emit an onResized event on the superview', function () {
         spyOn(box.onResized(), 'emit').andCallThrough();
 
         var v;
@@ -64,7 +64,13 @@ function boxSpecs (newBoxFunction) {
       it('should be chainable', function () {
         expect(box.resize({})).toBe(box);
       })
-
+      
+      it("should not modify the size parameter", function() {
+        var sizeParameter = {width: 100, height: 200};
+        box.resize(sizeParameter);
+        expect(sizeParameter).toEqualRect({width: 100, height: 200})
+      });
+      
       describe('when the size is restricted', function () {
 
         it('should not set the dimensions to greater that the max', function () {
@@ -160,7 +166,7 @@ function boxSpecs (newBoxFunction) {
 
     describe('moveTo()', function () {
 
-      it('should emit an onMoved event with the box', function () {
+      it('should emit an onMoved event with the itself', function () {
         spyOn(box.onMoved(), 'emit').andCallThrough();
 
         var v;
@@ -211,7 +217,13 @@ function boxSpecs (newBoxFunction) {
 
       it('should be chainable', function () {
         expect(box.moveTo({top: 0, left: 0})).toBe(box);
-      })
+      });
+      
+      it("should not modify the position parameter", function() {
+        var positionParameter = {top: 100, left: 200};
+        box.moveTo(positionParameter);
+        expect(positionParameter).toEqualRect({top: 100, left: 200})
+      });
 
       describe('when the position is restricted', function () {
 
@@ -453,6 +465,12 @@ function boxSpecs (newBoxFunction) {
             height: 0
           }
         })
+      });
+    
+      it("should not modify the restriction parameter", function() {
+        var restrictionParameter = {minimum: {top: 100, left: 200}, maximum: {top: 300, left: 500}};
+        box.restrictTo(restrictionParameter);
+        expect(restrictionParameter).toEqualRestrictions({minimum: {top: 100, left: 200}, maximum: {top: 300, left: 500}})
       });
     })
 

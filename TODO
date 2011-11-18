@@ -1,8 +1,7 @@
+MAKE SPECS PASS the move on :)
 specs have been abstracted where possible, review all specs and write content area idiosyncratic specs as well as addtional integrations specs for:
 > contentArea event emissions in response to the resizing of the boundary box and vice-versa
 > contentArea event emissions for border size changes (which do not cause the boundary box to resize).
-
-> check all method return values are specced, resize() wasn't
 
 THEN: introduce abstract box specs onto content area
 
@@ -13,7 +12,7 @@ SPEC that the contentArea onResized/onMoved events are emitted when the boundary
 CSS filtering for position ?! spec + implement
 
 
-
+> 
 
 
 

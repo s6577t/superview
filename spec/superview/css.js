@@ -17,7 +17,7 @@ describe('superview.css()', function () {
 
   describe('size effects', function () {
 
-    it("should maintain size()", function() {
+    it("should maintain the size() of the superview", function() {
       view.resize({width: 100, height: 100});
 
       var size0 = view.size();
@@ -28,8 +28,8 @@ describe('superview.css()', function () {
 
       expect(size0).toEqualRect(size1);
     });
-
-    it("should not emit an on resized event if the border size changes", function() {
+        
+    it("should not emit an onResized event from the superview if the border size changes", function() {
       spyOn(view.onResized(), 'emit');
 
       view.css('border', 'solid 1px red');
@@ -37,7 +37,24 @@ describe('superview.css()', function () {
       expect(view.onResized().emit).not.toHaveBeenCalled();
     });
 
-    it("should not emit an on resized event if the border size doesn't change", function() {
+    it("should emit an onResized event from the superview.contentArea if the border size changes", function() {
+      fail
+    });
+
+    it("should not emit an onResized event if the border size doesn't change", function() {
+      view.css('border', 'solid 1px red');
+
+      spyOn(view.onResized(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onResized().emit).not.toHaveBeenCalled();
+    });
+    
+    it("should not emit an onResized event on the superview.contentArea if the border size doesn't change", function() {
+      fail
+      return;
+      
       view.css('border', 'solid 1px red');
 
       spyOn(view.onResized(), 'emit');
@@ -61,6 +78,90 @@ describe('superview.css()', function () {
         width: 98,
         height: 98
       });
+    });
+
+  });
+  
+  describe('position effects', function () {
+
+    it("should maintain the position() of the superview", function() {
+      fail
+      //review...
+      view.moveTo({top: 100, left: 100});
+
+      var pos0 = view.position();
+
+      view.css('border', 'solid 1px red');
+
+      var pos1 = view.position();
+
+      expect(pos0).toEqualRect(pos1);
+    });
+        
+    it("should not emit an onMoved event from the superview if the border size changes", function() {
+      fail
+      // review
+      spyOn(view.onMoved(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onMoved().emit).not.toHaveBeenCalled();
+    });
+
+    it("should emit an onMoved event from the superview.contentArea if the border size change affects the top and left coordinate", function() {
+      fail
+    });
+    
+    it("should not emit an onMoved event if the border size doesn't change the top/left coordinate", function() {
+      fail
+      
+      view.css('border', 'solid 1px red');
+
+      spyOn(view.onMoved(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onMoved().emit).not.toHaveBeenCalled();
+    });
+
+    it("should not emit an onMoved event if the border size doesn't change", function() {
+      view.css('border', 'solid 1px red');
+
+      spyOn(view.onMoved(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onMoved().emit).not.toHaveBeenCalled();
+    });
+    
+    it("should not emit an onMoved event on the superview.contentArea if the border size doesn't change", function() {
+      fail
+      return;
+      
+      view.css('border', 'solid 1px red');
+
+      spyOn(view.onMoved(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onMoved().emit).not.toHaveBeenCalled();
+    });
+
+    it("should change the position of the contentArea when setting a border", function() {
+      fail
+      // view.moveTo({width: 100, height: 100});
+      // 
+      //       view.css('border', 'solid 1px red');
+      // 
+      //       var cssSize = {
+      //         width: parseInt(view.$().css('width')),
+      //         height: parseInt(view.$().css('height'))
+      //       }
+      // 
+      //       expect(cssSize).toEqualRect({
+      //         width: 98,
+      //         height: 98
+      //       });
     });
 
   })

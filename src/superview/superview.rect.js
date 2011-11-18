@@ -7,8 +7,8 @@ Superview.Rect = (function () {
   Rect.prototype = {
     has: function (member) {
       return this['has' + member.variableize(true)]();
-    },
-    flatten: function () {
+    }
+    , flatten: function () {
       var self = this,
           flat = {};
 
@@ -19,6 +19,48 @@ Superview.Rect = (function () {
       });
 
       return flat;
+    }
+    , removeBorder: function (borderMetrics) {
+      if (this.hasWidth()) {
+        this.width -= borderMetrics.width;
+      }
+      if (this.hasHeight()) {
+        this.height -= borderMetrics.height;
+      }
+      if (this.hasTop()) {
+        this.top += borderMetrics.top;
+      }
+      if (this.hasLeft()) {
+        this.left += borderMetrics.left;
+      }
+      if (this.hasRight()) {
+        this.right -= borderMetrics.right;
+      }
+      if (this.hasBottom()) {
+        this.bottom -= borderMetrics.bottom;
+      }
+      return this;
+    }
+    , addBorder: function (borderMetrics) {
+      if (this.hasWidth()) {
+        this.width += borderMetrics.width;
+      }
+      if (this.hasHeight()) {
+        this.height += borderMetrics.height;
+      }
+      if (this.hasTop()) {
+        this.top -= borderMetrics.top;
+      }
+      if (this.hasLeft()) {
+        this.left -= borderMetrics.left;
+      }
+      if (this.hasRight()) {
+        this.right += borderMetrics.right;
+      }
+      if (this.hasBottom()) {
+        this.bottom += borderMetrics.bottom;
+      }
+      return this;      
     }
   };
 

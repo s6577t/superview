@@ -95,8 +95,19 @@ Superview = (function ($) {
         }
 
         var borderMetrics = this.borderMetrics(),
-        deltaWidth =  priorBorderMetrics.width - borderMetrics.width,
+
+        deltaLeft   = priorBorderMetrics.left - borderMetrics.left;
+        deltaTop    = priorBorderMetrics.top - borderMetrics.top;
+        deltaWidth  = priorBorderMetrics.width - borderMetrics.width,
         deltaHeight = priorBorderMetrics.height - borderMetrics.height;
+
+        if (deltaLeft ||  deltaTop) {
+          this.contentArea().onMoved().emit(this.contentArea());
+        }
+
+        if (deltaWidth || deltaHeight) {
+          this.contentArea().onResized().emit(this.contentArea());
+        }
 
         this.$().css('width', parseInt(this.$().css('width')) + deltaWidth);
         this.$().css('height', parseInt(this.$().css('height')) + deltaHeight);
@@ -295,6 +306,7 @@ Superview = (function ($) {
 
       if (resized) {
         this.onResized().emit(this);
+        this.contentArea().onResized().emit(this.contentArea());
       }
 
       if (restricted && (typeof restrictionCallback === 'function')) {
@@ -366,6 +378,7 @@ Superview = (function ($) {
         position.bottom = position.top + size.height;
 
         this.onMoved().emit(this);
+        this.contentArea().onMoved().emit(this.contentArea());
       }
 
       if (restricted && (typeof restrictionCallback === 'function')) {
@@ -484,15 +497,63 @@ Superview = (function ($) {
     }
 
     , contentArea: function () {
-      return this._contentArea = this._contentArea || {
-        // resize, moveTo, size, position, restrictTo, restrictions
-        resize: function (newSize, restrictionCallback) {
-          // adjust the newSize by taking off border width etc. and relay to outer
-        }
-        , moveTo: function (newPosition, restrictionCallback) {
-          // 
-        }
-      };
+      return this._contentArea = this._contentArea || (function (superview) {
+        var contentArea = {
+
+          size: function () {
+            var boundaryBoxSize = superview.size();
+            var borderMetrics = superview.borderMetrics();
+
+            boundaryBoxSize.width -= borderMetrics.width;
+            boundaryBoxSize.height -= borderMetrics.height;
+
+            return boundaryBoxSize;
+          }
+          , resize: function (newSize, restrictionCallback) {
+            newSize = new Superview.Rect(newSize);
+            newSize.addBorder(superview.borderMetrics());
+
+            return superview.resize(newSize.flatten(), restrictionCallback);
+          }
+          , position: function () {
+            var boundaryBoxPosition = superview.position();
+            var borderMetrics = superview.borderMetrics();
+
+            boundaryBoxPosition.top += borderMetrics.top;
+            boundaryBoxPosition.bottom -= borderMetrics.bottom;
+            boundaryBoxPosition.left += borderMetrics.left;
+            boundaryBoxPosition.right -= borderMetrics.right;
+
+            return boundaryBoxPosition;
+          }
+          , moveTo: function (newPosition, restrictionCallback) {
+            newPosition = new Superview.Rect(newPosition);
+            newPosition.addBorder(superview.borderMetrics());
+            return superview.moveTo(newPosition.flatten(), restrictionCallback);
+          }
+          , restrictTo: function (restrictions) {
+            restrictions = new Superview.Restrictions(restrictions);
+            var borderMetrics = superview.borderMetrics();   
+            restrictions.minimum.addBorder(borderMetrics);
+            restrictions.maximum.addBorder(borderMetrics);
+            return superview.restrictions(restrictions.flatten());
+          }
+          , restrictions: function () {
+            var restrictions = new Superview.Restrictions(superview.restrictions());
+            var borderMetrics = superview.borderMetrics();   
+            restrictions.minimum.removeBorder(borderMetrics);
+            restrictions.maximum.removeBorder(borderMetrics);
+            return restrictions.flatten();
+          }
+        };
+
+        eventify(contentArea).define(
+          'onMoved', // (source contentArea)
+          'onResized' // (source contentArea)
+        );
+
+        return contentArea;
+      })(this);
     }
 
     , anchorTo: function (otherView, anchoring) {

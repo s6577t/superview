@@ -9,13 +9,13 @@ describe('superview boundary box', function () {
   }));
 
   describe("idiosyncratic functionality", function() {
-    
+
     var view;
-    
+
     beforeEach(function () {
       view = new Superview;
     })
-    
+
     describe('superview.size()', function () {
 
       it('does not return the internal size object', function () {
@@ -32,7 +32,7 @@ describe('superview boundary box', function () {
         expect(view.size()).toEqualRect({width: 100, height: 200});
       });
     });
-    
+
     describe('superview.resize()', function () {
 
       beforeEach(function () {
@@ -52,17 +52,33 @@ describe('superview boundary box', function () {
         expect(view.$().outerWidth()).toEqual(123);
         expect(view.$().outerHeight()).toEqual(456);
       });
-
     });
-  
+
     describe('superview.position()', function () {
+      
       it('does not return the internal position object', function () {
         expect(view.position()).not.toBe(view._position);
       });
+
+      it("should return the outer boundary box position including border", function() {
+        view.resize({width: 100, height: 150});
+        view.moveTo({top: 5, left: 10});
+        // the border size makes no difference to the size of a boundary box
+        view.css('border', 'solid 5px red');
+
+        var position = view.position();
+
+        expect(position).toEqualRect({
+          top: 5,
+          left: 10,
+          right: 110,
+          bottom: 155
+        })
+      });
     });
-    
+
     describe('superview.moveTo()', function() {
-      
+
       it('should pass on the position to the dom element', function () {
         view.moveTo({top: 123, left: 456});
 
@@ -80,7 +96,7 @@ describe('superview boundary box', function () {
         });
       });
     });
-    
+
     describe("superview.restrictions()", function() {
       it("should not return the internally maintained object", function() {
 
