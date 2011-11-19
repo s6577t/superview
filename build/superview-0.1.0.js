@@ -1,4 +1,23 @@
-Superview = (function ($) {
+/*Copyright (C) 2011 by sjltaylor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicence, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/;Superview = (function ($) {
 
   viewIdSpool = 1;
 
@@ -776,4 +795,227 @@ Superview = (function ($) {
   }
 
   return Superview;
-})(jQuery)
+})(jQuery);var KeyCodes = {
+  Escape: 27,
+  Return: 13
+};Superview.CssFilter = (function () {
+
+  function normalizeKey (cssKey) {
+    return cssKey.toLowerCase().replace(/-/g, '');
+  }
+
+  var filters = [
+    /^margin.*/i,
+    /^padding.*/i,
+    /^(min|max).*$/i,
+    /^(left|right|top|bottom|width|height)$/i,
+    /^position$/i
+  ];
+
+  return {
+    isAllowed: function (cssKey) {
+      cssKey = normalizeKey(cssKey);
+
+      for (var i = 0; i < filters.length; i++) {
+        if (cssKey.match(filters[i])) return false;
+      }
+
+      return true;
+    }
+  } 
+})();Superview.Page = (function () {
+  
+  var Page = function () {
+    Object.extend(this).mixin(Superview);
+  };
+  
+  Page.prototype = {
+    initialize: function () {
+      Superview.Window.install();
+      this.$().addClass('page');
+      this.addTo(Superview.Window);
+      this.render();
+      this.parent().initialize();
+      return this;
+    },
+    fitWindow: function () {
+      return this.anchorTo(Superview.Window, {
+        width: true,
+        height: true
+      });
+    },
+  };
+  
+  return Page;
+})();
+
+
+;Superview.Rect = (function () {
+
+  Rect = function (rect) {
+    Object.extend(this).withObject(rect);
+  }
+
+  Rect.prototype = {
+    has: function (member) {
+      return this['has' + member.variableize(true)]();
+    }
+    , flatten: function () {
+      var self = this,
+          flat = {};
+
+      ['top', 'left', 'bottom', 'right', 'width', 'height'].forEach(function (member) {
+        if (typeof self[member] !== 'undefined') {
+          flat[member] = self[member];
+        }
+      });
+
+      return flat;
+    }
+    , removeBorder: function (borderMetrics) {
+      if (this.hasWidth()) {
+        this.width -= borderMetrics.width;
+      }
+      if (this.hasHeight()) {
+        this.height -= borderMetrics.height;
+      }
+      if (this.hasTop()) {
+        this.top += borderMetrics.top;
+      }
+      if (this.hasLeft()) {
+        this.left += borderMetrics.left;
+      }
+      if (this.hasRight()) {
+        this.right -= borderMetrics.right;
+      }
+      if (this.hasBottom()) {
+        this.bottom -= borderMetrics.bottom;
+      }
+      return this;
+    }
+    , addBorder: function (borderMetrics) {
+      if (this.hasWidth()) {
+        this.width += borderMetrics.width;
+      }
+      if (this.hasHeight()) {
+        this.height += borderMetrics.height;
+      }
+      if (this.hasTop()) {
+        this.top -= borderMetrics.top;
+      }
+      if (this.hasLeft()) {
+        this.left -= borderMetrics.left;
+      }
+      if (this.hasRight()) {
+        this.right += borderMetrics.right;
+      }
+      if (this.hasBottom()) {
+        this.bottom += borderMetrics.bottom;
+      }
+      return this;      
+    }
+  };
+
+  ['Top', 'Right', 'Bottom', 'Left'].forEach(function (edge) {
+    Rect.prototype['has' + edge] = function () {
+      var edgeValue = this[edge.toLowerCase()];
+      return (typeof edgeValue === 'number') && !isNaN(edgeValue) && edgeValue !== Infinity
+    }
+  });
+
+  ['Width', 'Height'].forEach(function (dimension) {
+    Rect.prototype['has' + dimension] = function () {
+      var dimensionValue = this[dimension.toLowerCase()];
+      return (typeof dimensionValue === 'number') && !isNaN(dimensionValue) && dimensionValue !== Infinity && dimensionValue >= 0;
+    }
+  });
+
+  return Rect;
+})();;Superview.Restrictions = (function () {
+
+  Restrictions = function (restrictions) {
+    restrictions = restrictions || {};
+    Object.extend(this).withObject(restrictions);
+    this.minimum = new Superview.Rect(restrictions.minimum);
+    this.maximum = new Superview.Rect(restrictions.maximum);
+  }
+
+  Restrictions.prototype = {
+    flatten: function () {
+      var flat = {};
+
+      flat.minimum = this.minimum.flatten();
+      flat.maximum = this.maximum.flatten();
+
+      return flat;
+    }
+  };
+
+  ['Minimum', 'Maximum'].forEach(function (limit) {
+    Restrictions.prototype['has' + limit] = function () {
+      return typeof this[limit.toLowerCase()] === 'object';
+    }
+  })
+
+  return Restrictions;
+})();
+
+;Superview.Window = (function () {
+  
+  var Window = new Superview().render();
+
+  function fitToWindow () {
+    var w = jQuery(window),
+        body = jQuery('body');
+    
+    body.width(w.width());
+    body.height(w.height());
+    Window.outerResize({
+      width: w.width(),
+      height: w.height()
+    });
+  }
+  
+  Object.override(Window).withObject({
+    addTo: function (base) {
+      throw new Error('cannot set the parent of the window');
+    },
+    remove: function (base) {
+      throw new Error('cannot remove the window');
+    }
+  });
+
+  Object.extend(Window).withObject({
+    install: function () {
+      var body = jQuery('body'),
+          w = jQuery(window);
+      
+      body.addClass('superview').css({
+        margin: 0,
+        padding: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden'
+      });
+      
+      Window.$().addClass('window').appendTo(body);
+      
+      fitToWindow();
+      w.resize(fitToWindow);
+    },
+    // only use this for testing
+    _uninstall: function () {
+      jQuery('body').removeClass('superview').css({
+        margin: 0,
+        padding: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'scroll'
+      });
+      Window.$().detach();
+      jQuery('window').unbind('resize', fitToWindow);
+    }
+  });
+  
+  return Window; 
+})();;

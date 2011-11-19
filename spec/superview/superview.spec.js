@@ -28,8 +28,10 @@ describe('superview', function () {
     });
 
     it('should initialize its div container as position:absolute display:inline-block', function () {
-      expect(new Superview().$().css('position')).toEqual('absolute');
-      expect(new Superview().$().css('display')).toEqual('inline-block');
+      var view = new Superview();
+      
+      expect(view.$().css('position')).toEqual('absolute');
+      expect(view.elem().style.display).toEqual('inline-block');
     })
   })
 

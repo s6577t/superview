@@ -87,7 +87,7 @@ describe("view tree related behaviour", function () {
     });
 
     it('should append a subview to the parent views dom', function () {
-      child.$().id('woof');
+      child.$().attr('id', 'woof');
       child.addTo(parent);
       expect(parent.$().find('#woof').toArray()).not.toBeEmpty();
     })

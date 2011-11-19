@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head><title>superview</title>
+
+  <script src="/vendor/jquery-1.7.min.js" type="text/javascript"></script>
+  <script src="/vendor/eventify-0.1.2.js" type="text/javascript"></script>
+  <script src="/vendor/js-core-ext-0.1.7.js" type="text/javascript"></script>
+  
+  <script src="/src/superview.js" type="text/javascript"></script>
+  <script src="/src/superview/superview.css_filter.js" type="text/javascript"></script>
+  <script src="/src/superview/superview.page.js" type="text/javascript"></script>
+  <script src="/src/superview/superview.rect.js" type="text/javascript"></script>
+  <script src="/src/superview/superview.restrictions.js" type="text/javascript"></script>
+  <script type='text/javascript'>
+
+  </script>
+</head>
+<body>
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+      var v = new Superview();
+      v.$().appendTo('body');
+      console.assert(v.$().css('display') === 'inline-block')
+    })
+  </script>
+
+</body>
+</html>
