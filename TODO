@@ -1,54 +1,33 @@
--> VISUAL_SPECS for constraints
+!: Fix Firefox failing specs
 
-  d: contentArea()
-    > size changes when its superview's border is set
-    > view.contentArea().[resize|moveTo|size|position|restrictTo|anchorTo]()
-    > reintroduce page/window specs  
-  
-put restrictions() functionality in superview.restrictions and likewise for similar behaviour
-modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews have it)
+3: calls to css() for top,left,right,bottom,width,height should result in a call to resize/moveTo
+4: reintroduce anchoring and fix fractional positioning bug (if it still exists?)
+  > anchorTo restriction callback
+  >: if I bind a box to the right of something and then resize it, it should still stick to the right
+          > visual spec
+          > spec
+  >: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
+          > visual spec
+          > spec
+  >: RETEST visual and spec: fractional layouts anchorTo(..., {left: 0.5})
+4b: reintroduce page/window specs            
 
-2: padding and border css intercepts -> trigger event
-3: refactor anchoring and fix fractional positioning bug (if it still exists?)
-?4: detect and refuse cyclic anchoring
 5: ancestor anchoring behaviour revision
 6: anchorRestrictionTo handling - if it's quick to do
-7: fix draggable with padding/border bug
+7: resizeable() and draggable()
+8?: change to use api like Superview.extend({}) rather than MyView() { Object.extend(this).withMixin(Superview)}
+9: run tests and view visuals in Safari and Firefox and on the iPad
+10: review and document initialization protocol
+11: add presenter getter/setter
+  > presenter formats data for the view, what is the reverse process?
+12: Write visual specs, examples and documentation
 
-> anchorTo restriction callback
+13: make it so the superview can automatically resize to fit it's contentArea to the total outer dimensions of the jQuery contents(). this involves three things methods: 
+a) A function to size the superview to according to it's contents
+b) some logic in updated() that updates the size when content changes
+c) A function to enable to the automatic updating of contentArea size when updating
 
->: if I bind a box to the right of something and then resize it, it should still stick to the right
-        > visual spec
-        > spec
->: if I bind to the right of an ancestor I don't want it's right position, I want width (similar with bottom/height)
-        > visual spec
-        > spec
 
-?> change to use api like Superview.extend({}) rather than MyView() { Object.extend(this).withMixin(Superview)}
-
->: dragging with a border sent the position F**king crazy
-
->: raise an error if there are cyclic anchorings
-
->: setting paddings and borders causes a resize .css({}) intercept border/padding changes
-
->: RETEST visual and spec: fractional layouts anchorTo(..., {left: 0.5})
-
->: bounds (max/min inner/outer Top|Left|Right|Bottom|Width|Height) should be anchorable too! bounds() and anchorBoundsTo()
-
->: run tests and view visuals in Safari and Firefox and on the iPad
-
-> make it sothe superview can automatically resize to fit it's contentArea to the total outer dimensions of the jQuery contents(). this involves three things methods: 
-1) A function to size the superview to according to it's contents
-2) some logic in updated() that updates the size when content changes
-3) A function to enable to the automatic updating of contentArea size when updating
-
-> calls to css() for top,left,right,bottom,width,height should result in a call to resize/moveTo
-> review and document initialization protocol
-> add presenter getter/setter
-> review controller setter/getter
-> filter CSS position to only allow absolute, and relative IFF the superview is a root. WHAT ABOUT position: fixed?
-
-> allow root superview to be position: relative
+14: allow root superview to be position: relative
   
 READ ABOUT DERBYJS before doing supermodel
