@@ -201,7 +201,7 @@ describe('superview.css()', function () {
     ];
 
     var allowedExamples = [
-    'border-left-width',
+    'border-width',
     'font-size'
     ];
 
@@ -241,7 +241,12 @@ describe('superview.css()', function () {
 
     it("should not allow the position to be changed from absolute", function() {
       view.css('position', 'relative');
-      expect(view.css('position')).toEqual('absolute');
+      expect(view.elem().style.position).toEqual('absolute');
+    });
+
+    it("should not allow the display mode to be changed from block", function() {
+      view.css('display', 'inline-block');
+      expect(view.elem().style.display).toEqual('block');
     });
   })
 })

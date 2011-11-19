@@ -26,7 +26,7 @@ THE SOFTWARE.
 
     e.id             = 'superview_' + viewIdSpool;
     e.style.overflow = 'hidden';
-    e.style.display  = 'inline-block';
+    e.style.display  = 'block';
     e.style.position = 'absolute';
     e.style.left     = 0;
     e.style.top      = 0;
@@ -276,12 +276,12 @@ THE SOFTWARE.
 
     , borderMetrics: function () {
       var self = this;
-      var thi$ = this.$();
+      var e = this.elem();
       var m = {
-        top:    parseInt(thi$.css('borderTopWidth'), 10) || 0 ,
-        right:  parseInt(thi$.css('borderRightWidth'), 10) || 0,
-        bottom: parseInt(thi$.css('borderBottomWidth'), 10) || 0,
-        left:   parseInt(thi$.css('borderLeftWidth'), 10) || 0
+        top:    parseInt(e.style.borderTopWidth, 10) || 0 ,
+        right:  parseInt(e.style.borderRightWidth, 10) || 0,
+        bottom: parseInt(e.style.borderBottomWidth, 10) || 0,
+        left:   parseInt(e.style.borderLeftWidth, 10) || 0
       }
 
       m.width = m.right + m.left;
@@ -809,7 +809,8 @@ THE SOFTWARE.
     /^padding.*/i,
     /^(min|max).*$/i,
     /^(left|right|top|bottom|width|height)$/i,
-    /^position$/i
+    /^position$/i,
+    /^display$/i
   ];
 
   return {

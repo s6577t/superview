@@ -28,6 +28,8 @@ b) some logic in updated() that updates the size when content changes
 c) A function to enable to the automatic updating of contentArea size when updating
 
 
-14: allow root superview to be position: relative
+4: allow root superview to be position: relative. When this is the case the display should be inline-block.
+> displayRootInline() -> display: 'inline-block'; position: 'relative'
+> positionAbsolute() -> display: 'block'; position: 'absolute'
   
 READ ABOUT DERBYJS before doing supermodel

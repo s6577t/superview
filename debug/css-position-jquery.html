@@ -11,15 +11,42 @@
   <script src="/src/superview/superview.rect.js" type="text/javascript"></script>
   <script src="/src/superview/superview.restrictions.js" type="text/javascript"></script>
   <script type='text/javascript'>
+    
+    function Uberview () {
+      this.e = (function superviewElement () {
+        var e = document.createElement('div');
 
+        e.id             = 'superview_' + viewIdSpool;
+        e.style.overflow = 'hidden';
+        e.style.position = 'absolute';
+        e.style.display  = 'inline-block';
+        e.style.left     = 0;
+        e.style.top      = 0;
+
+        return e;
+      })();
+    }
+    
+    Uberview.prototype = {
+      $: function () {
+        return jQuery(this.e);
+      },
+      elem: function () {
+        return this.e;
+      }
+    }
+    
   </script>
 </head>
 <body>
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
-      var v = new Superview();
+      var v = new Uberview();
+    //  var v = new Superview();
       v.$().appendTo('body');
+      console.info(v.elem().style.display);
+      console.warn(v.$().css('display'));
       console.assert(v.$().css('display') === 'inline-block')
     })
   </script>

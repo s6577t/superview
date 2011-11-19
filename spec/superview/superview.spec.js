@@ -31,7 +31,6 @@ describe('superview', function () {
       var view = new Superview();
       
       expect(view.$().css('position')).toEqual('absolute');
-      expect(view.elem().style.display).toEqual('inline-block');
     })
   })
 

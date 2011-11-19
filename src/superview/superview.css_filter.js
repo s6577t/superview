@@ -9,7 +9,8 @@ Superview.CssFilter = (function () {
     /^padding.*/i,
     /^(min|max).*$/i,
     /^(left|right|top|bottom|width|height)$/i,
-    /^position$/i
+    /^position$/i,
+    /^display$/i
   ];
 
   return {
