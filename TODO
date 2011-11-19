@@ -42,6 +42,8 @@ contentArea should have its own onMoved event which is emitted when the border s
     > reintroduce page/window specs
   e: get rid of Superview#$() replace with elem() => HTMLElement
   
+  
+  
 put restrictions() functionality in superview.restrictions and likewise for similar behaviour
 modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews have it)
 
@@ -75,9 +77,15 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 
 >: run tests and view visuals in Safari and Firefox and on the iPad
 
+> make it sothe superview can automatically resize to fit it's contentArea to the total outer dimensions of the jQuery contents(). this involves three things methods: 
+1) A function to size the superview to according to it's contents
+2) some logic in updated() that updates the size when content changes
+3) A function to enable to the automatic updating of contentArea size when updating
+
 > calls to css() for top,left,right,bottom,width,height should result in a call to resize/moveTo
 > review and document initialization protocol
 > add presenter getter/setter
 > review controller setter/getter
 > filter CSS position to only allow absolute, and relative IFF the superview is a root. WHAT ABOUT position: fixed?
   
+READ ABOUT DERBYJS before doing supermodel

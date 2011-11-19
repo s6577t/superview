@@ -82,12 +82,12 @@ describe('superview boundary box', function () {
       it('should pass on the position to the dom element', function () {
         view.moveTo({top: 123, left: 456});
 
-        expect(parseInt(view.$().css('top'))).toEqual(123);
-        expect(parseInt(view.$().css('left'))).toEqual(456);
+        expect(parseInt(view.$().css('top'), 10)).toEqual(123);
+        expect(parseInt(view.$().css('left'), 10)).toEqual(456);
 
         var css = {
-          left: parseInt(view.$().css('left')),
-          top: parseInt(view.$().css('top'))
+          left: parseInt(view.$().css('left'), 10),
+          top: parseInt(view.$().css('top'), 10)
         };
 
         expect(css).toEqualRect({
@@ -95,6 +95,74 @@ describe('superview boundary box', function () {
           left: 456
         });
       });
+    });
+
+    describe("superview.restrictTo()", function() {
+      it('should update the current size when the minimum size is set', function () {
+        view.resize({width: 0, height: 0});
+
+        spyOn(view, 'resize').andCallThrough();
+
+        view.restrictTo({
+          minimum: {
+            width: 30,
+            height: 30
+          }
+        });
+
+        expect(view.size()).toEqualRect({width: 30, height: 30});
+        expect(view.resize).toHaveBeenCalled();
+      })
+
+      it('should update the current size when the maximum size is set', function () {
+        view.resize({width: 500, height: 500});
+
+        spyOn(view, 'resize').andCallThrough();
+
+        view.restrictTo({
+          maximum: {
+            width: 100,
+            height: 100
+          }
+        });
+
+        expect(view.size()).toEqualRect({width: 100, height: 100});
+        expect(view.resize).toHaveBeenCalled();
+      });
+
+      it('should update the current position when the maximum position is set', function () {
+        view.moveTo({top: 500, left: 500});
+
+        spyOn(view, 'moveTo').andCallThrough();
+
+        view.restrictTo({
+          maximum: {
+            top: 100,
+            left: 100
+          }
+        });
+
+        expect(view.position()).toEqualRect({top: 100, left: 100, bottom: 100, right: 100});
+        expect(view.moveTo).toHaveBeenCalled();
+      });
+
+      it('should update the current position when the minimum position is set', function () {
+        view.moveTo({top: 500, left: 500});
+
+        spyOn(view, 'moveTo').andCallThrough();
+
+        view.restrictTo({
+          minimum: {
+            top: 600,
+            left: 600
+          }
+        });
+
+        expect(view.position()).toEqualRect({top: 600, left: 600, bottom: 600, right: 600});
+        expect(view.moveTo).toHaveBeenCalled();
+      });
+
+      
     });
 
     describe("superview.restrictions()", function() {

@@ -15,15 +15,18 @@ describe('superview content area box', function () {
     beforeEach(function () {
       view = new Superview;
       contentArea = view.contentArea();
+      view.css({border: 'solid 5px red'});
+    });
+
+    describe("superview.contentArea().boundaryBox()", function() {
+      it("should return the superview", function() {
+        expect(contentArea.boundaryBox()).toBe(view);
+      });
     });
 
     describe('superview.contentArea().size()', function () {
 
       it('should return the width and height excluding border', function () {
-        fail
-        view.$().css({
-          border: 'solid 5px red'
-        });
 
         view.resize({width: 100, height: 200});
 
@@ -34,21 +37,38 @@ describe('superview content area box', function () {
     describe("superview.contentArea().resize()", function() {
 
       it("should pass on the call to the boundary box with adjusted arguments", function() {
-        fail
+        var adjustedSize;
+
+        spyOn(view, 'resize').andCallFake(function (size) {
+          adjustedSize = size;
+        });
+
+        contentArea.resize({width: 90, height: 90});
+
+        expect(adjustedSize).toEqualRect({width: 100, height: 100});
       });
     });
 
     describe("superview.contentArea().position()", function() {
 
       it("should return the position of the content area within the border of the superview", function() {
-        fail()
+        view.resize({width: 100, height: 100});
+        expect(contentArea.position()).toEqualRect({top: 5, left: 5, right: 95, bottom: 95});
       });
     });
 
     describe("superview.contentArea().moveTo()", function() {
 
       it("should pass on the moveTo call to the superview boundary box with adjusted arguments", function() {
-        fail
+        var adjustedPosition;
+
+        spyOn(view, 'moveTo').andCallFake(function (position) {
+          adjustedPosition = position;
+        });
+
+        contentArea.moveTo({top: 90, left: 90});
+
+        expect(adjustedPosition).toEqualRect({top: 85, left: 85});
       });
     });
   });

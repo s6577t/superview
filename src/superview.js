@@ -109,8 +109,13 @@ Superview = (function ($) {
           this.contentArea().onResized().emit(this.contentArea());
         }
 
-        this.$().css('width', parseInt(this.$().css('width')) + deltaWidth);
-        this.$().css('height', parseInt(this.$().css('height')) + deltaHeight);
+        this.$().css('width', parseInt(this.$().css('width'), 10) + deltaWidth);
+        this.$().css('height', parseInt(this.$().css('height'), 10) + deltaHeight);
+
+        borderMetrics = this.borderMetrics();
+        var size = this._size;
+        size.width = Math.max(size.width, borderMetrics.width);
+        size.height = Math.max(size.height, borderMetrics.height);
 
         return this;
       }
@@ -243,10 +248,10 @@ Superview = (function ($) {
       var self = this;
       var thi$ = this.$();
       var m = {
-        top:    parseFloat(thi$.css('borderTopWidth'), 10) || 0 ,
-        right:  parseFloat(thi$.css('borderRightWidth'), 10) || 0,
-        bottom: parseFloat(thi$.css('borderBottomWidth'), 10) || 0,
-        left:   parseFloat(thi$.css('borderLeftWidth'), 10) || 0
+        top:    parseInt(thi$.css('borderTopWidth'), 10) || 0 ,
+        right:  parseInt(thi$.css('borderRightWidth'), 10) || 0,
+        bottom: parseInt(thi$.css('borderBottomWidth'), 10) || 0,
+        left:   parseInt(thi$.css('borderLeftWidth'), 10) || 0
       }
 
       m.width = m.right + m.left;
@@ -374,9 +379,6 @@ Superview = (function ($) {
 
       if (moved) {
 
-        position.right = position.left + size.width;
-        position.bottom = position.top + size.height;
-
         this.onMoved().emit(this);
         this.contentArea().onMoved().emit(this.contentArea());
       }
@@ -389,7 +391,6 @@ Superview = (function ($) {
     }
 
     , restrictTo: function (restrictions) {
-      if (restrictions === null) restrictions = {};
 
       var self = this;
       var size = this.size();
@@ -493,56 +494,64 @@ Superview = (function ($) {
       return Object.shallowCopy(this._size);
     }
     , position: function () {
-      return Object.shallowCopy(this._position);
+      var position = Object.shallowCopy(this._position);
+      position.right = position.left + this._size.width;
+      position.bottom = position.top + this._size.height;
+      return position;
     }
 
     , contentArea: function () {
       return this._contentArea = this._contentArea || (function (superview) {
         var contentArea = {
-
-          size: function () {
-            var boundaryBoxSize = superview.size();
-            var borderMetrics = superview.borderMetrics();
-
-            boundaryBoxSize.width -= borderMetrics.width;
-            boundaryBoxSize.height -= borderMetrics.height;
-
-            return boundaryBoxSize;
+          boundaryBox: function () {
+            return superview;
+          }
+          , size: function () {
+            var boundaryBoxSize = new Superview.Rect(superview.size());
+            return boundaryBoxSize.removeBorder(superview.borderMetrics()).flatten();
           }
           , resize: function (newSize, restrictionCallback) {
+
             newSize = new Superview.Rect(newSize);
             newSize.addBorder(superview.borderMetrics());
 
-            return superview.resize(newSize.flatten(), restrictionCallback);
+            superview.resize(newSize.flatten(), restrictionCallback);
+
+            return this;
           }
           , position: function () {
-            var boundaryBoxPosition = superview.position();
-            var borderMetrics = superview.borderMetrics();
-
-            boundaryBoxPosition.top += borderMetrics.top;
-            boundaryBoxPosition.bottom -= borderMetrics.bottom;
-            boundaryBoxPosition.left += borderMetrics.left;
-            boundaryBoxPosition.right -= borderMetrics.right;
-
-            return boundaryBoxPosition;
+            var boundaryBoxPosition = new Superview.Rect(superview.position());
+            return boundaryBoxPosition.removeBorder(superview.borderMetrics()).flatten();
           }
           , moveTo: function (newPosition, restrictionCallback) {
+
             newPosition = new Superview.Rect(newPosition);
             newPosition.addBorder(superview.borderMetrics());
-            return superview.moveTo(newPosition.flatten(), restrictionCallback);
+
+            superview.moveTo(newPosition.flatten(), restrictionCallback);
+
+            return this;
           }
           , restrictTo: function (restrictions) {
+
             restrictions = new Superview.Restrictions(restrictions);
-            var borderMetrics = superview.borderMetrics();   
+            var borderMetrics = superview.borderMetrics();
+
             restrictions.minimum.addBorder(borderMetrics);
             restrictions.maximum.addBorder(borderMetrics);
-            return superview.restrictions(restrictions.flatten());
+
+            superview.restrictTo(restrictions.flatten());
+
+            return this;
           }
           , restrictions: function () {
+
             var restrictions = new Superview.Restrictions(superview.restrictions());
-            var borderMetrics = superview.borderMetrics();   
+            var borderMetrics = superview.borderMetrics();
+
             restrictions.minimum.removeBorder(borderMetrics);
             restrictions.maximum.removeBorder(borderMetrics);
+
             return restrictions.flatten();
           }
         };

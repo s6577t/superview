@@ -7,7 +7,7 @@ describe('superview.borderMetrics()', function () {
   })
 
   it('should return the correct values', function () {
-
+    
     view.$().css({
       borderTop: 1,
       borderBottom: 2,

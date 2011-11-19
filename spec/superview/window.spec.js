@@ -24,7 +24,7 @@ xdescribe('Superview.Window', function () {
     it('should not have margin or padding', function () {
       ['top', 'bottom', 'right', 'left'].forEach(function (side) {
         ['padding', 'margin', 'border'].forEach(function (edging) {
-          var v = parseFloat(w.$().css(edging + '-' + side) || 0);
+          var v = parseFloat(w.$().css(edging + '-' + side, 10) || 0);
           expect(v).toEqual(0);
         })
       })

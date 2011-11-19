@@ -82,6 +82,7 @@ function boxSpecs (newBoxFunction) {
           });
 
           box.resize({width: 301, height: 301});
+          
           expect(box.size()).toEqualRect({
             width: 300,
             height: 300
@@ -311,70 +312,6 @@ function boxSpecs (newBoxFunction) {
       it("should be chainable", function() {
         var r = box.restrictTo({});
         expect(r).toBe(box);
-      });
-
-      it('should update the current size when the minimum size is set', function () {
-        box.resize({width: 0, height: 0});
-
-        spyOn(box, 'resize').andCallThrough();
-
-        box.restrictTo({
-          minimum: {
-            width: 30,
-            height: 30
-          }
-        });
-
-        expect(box.size()).toEqualRect({width: 30, height: 30});
-        expect(box.resize).toHaveBeenCalled();
-      })
-
-      it('should update the current size when the maximum size is set', function () {
-        box.resize({width: 500, height: 500});
-
-        spyOn(box, 'resize').andCallThrough();
-
-        box.restrictTo({
-          maximum: {
-            width: 100,
-            height: 100
-          }
-        });
-
-        expect(box.size()).toEqualRect({width: 100, height: 100});
-        expect(box.resize).toHaveBeenCalled();
-      });
-
-      it('should update the current position when the maximum position is set', function () {
-        box.moveTo({top: 500, left: 500});
-
-        spyOn(box, 'moveTo').andCallThrough();
-
-        box.restrictTo({
-          maximum: {
-            top: 100,
-            left: 100
-          }
-        });
-
-        expect(box.position()).toEqualRect({top: 100, left: 100, bottom: 100, right: 100});
-        expect(box.moveTo).toHaveBeenCalled();
-      });
-
-      it('should update the current position when the minimum position is set', function () {
-        box.moveTo({top: 500, left: 500});
-
-        spyOn(box, 'moveTo').andCallThrough();
-
-        box.restrictTo({
-          minimum: {
-            top: 600,
-            left: 600
-          }
-        });
-
-        expect(box.position()).toEqualRect({top: 600, left: 600, bottom: 600, right: 600});
-        expect(box.moveTo).toHaveBeenCalled();
       });
 
       it("should not change the size if the current size is within the bounds", function() {
