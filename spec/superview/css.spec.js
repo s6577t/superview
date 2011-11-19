@@ -28,13 +28,23 @@ describe('superview.css()', function () {
 
       expect(size0).toEqualRect(size1);
     });
-        
-    it("should not emit an onResized event from the superview if the border size changes", function() {
+
+    it("should not emit an onResized event from the superview if the border size changes and doesn't affect the size", function() {
+      view.resize({width: 100, height: 100});
+
       spyOn(view.onResized(), 'emit');
 
       view.css('border', 'solid 1px red');
 
       expect(view.onResized().emit).not.toHaveBeenCalled();
+    });
+
+    it("should emit an onResized event from the superview if the border size changes and affects the size", function() {
+      spyOn(view.onResized(), 'emit');
+
+      view.css('border', 'solid 1px red');
+
+      expect(view.onResized().emit).toHaveBeenCalled();
     });
 
     it("should emit an onResized event from the superview.contentArea if the border size changes", function() {
@@ -52,9 +62,9 @@ describe('superview.css()', function () {
 
       expect(view.onResized().emit).not.toHaveBeenCalled();
     });
-    
+
     it("should not emit an onResized event on the superview.contentArea if the border size doesn't change", function() {
-      
+
       view.css('border', 'solid 1px red');
 
       spyOn(view.contentArea().onResized(), 'emit');
@@ -81,7 +91,7 @@ describe('superview.css()', function () {
     });
 
   });
-  
+
   describe('position() effects', function () {
 
     it("should maintain the position() of the superview", function() {
@@ -91,15 +101,15 @@ describe('superview.css()', function () {
       var pos0 = view.position();
 
       view.css('border', 'solid 1px red');
-      
+
       pos0.right += 2;
       pos0.bottom += 2;
-      
+
       expect(view.position()).toEqualRect(pos0);
     });
-        
+
     it("should not emit an onMoved event from the superview if the border size changes", function() {
-      
+
       spyOn(view.onMoved(), 'emit');
 
       view.css('border', 'solid 1px red');
@@ -109,18 +119,18 @@ describe('superview.css()', function () {
 
     it("should emit an onMoved event from the superview.contentArea if the border size change affects the top and left coordinate", function() {
       spyOn(view.contentArea().onMoved(), 'emit');
-      
+
       view.css('border', 'solid 10px red');
-      
+
       expect(view.contentArea().onMoved().emit).toHaveBeenCalled();
     });
-    
+
     it("should not emit an onMoved event if the border size doesn't change the top/left coordinate", function() {
       spyOn(view.contentArea().onMoved(), 'emit');
-      
+
       view.css('border-right', 'solid 10px red');
       view.css('border-bottom', 'solid 10px red');
-      
+
       expect(view.contentArea().onMoved().emit).not.toHaveBeenCalled();
     });
 
@@ -133,7 +143,7 @@ describe('superview.css()', function () {
 
       expect(view.onMoved().emit).not.toHaveBeenCalled();
     });
-    
+
     it("should not emit an onMoved event on the superview.contentArea if the border size doesn't change", function() {
       view.css('border', 'solid 1px red');
 
@@ -145,9 +155,9 @@ describe('superview.css()', function () {
     });
 
     it("should change the position of the contentArea when setting a border", function() {
-      
+
       view.moveTo({top: 100, left: 100});
-      
+
       view.css('border', 'solid 1px red');
 
       expect(view.contentArea().position()).toEqualRect({
@@ -228,7 +238,7 @@ describe('superview.css()', function () {
         expect(parseInt(view.css(setting), 10)).toEqual(5678);
       });
     });
-  
+
     it("should not allow the position to be changed from absolute", function() {
       view.css('position', 'relative');
       expect(view.css('position')).toEqual('absolute');

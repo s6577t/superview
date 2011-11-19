@@ -52,6 +52,16 @@ describe('superview boundary box', function () {
         expect(view.$().outerWidth()).toEqual(123);
         expect(view.$().outerHeight()).toEqual(456);
       });
+      
+      it("should not resize to less than the border allows", function() {
+        view.resize({width: 100, height: 100});
+        view.css('border', 'solid 10px green');
+        view.resize({width: 1, height: 1});
+        expect(view.size()).toEqualRect({
+          width: 20,
+          height: 20
+        })
+      });
     });
 
     describe('superview.position()', function () {

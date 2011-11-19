@@ -39,7 +39,7 @@ Superview = (function ($) {
         left: 0
       },
       _vid: viewIdSpool++,
-      _zElem: jQuery('<div>').css({
+      _zElement: z.div().css({
         overflow: 'hidden',
         display: 'inline-block',
         position: 'absolute',
@@ -64,10 +64,10 @@ Superview = (function ($) {
     DOM related members
     */
     , elem: function () {
-      return this._zElem.elem();
+      return this._zElement.elem();
     }
     , $: function () {
-      return this._zElem;
+      return this._zElement;
     }
     , css: function () {
 
@@ -106,16 +106,20 @@ Superview = (function ($) {
         }
 
         if (deltaWidth || deltaHeight) {
-          this.contentArea().onResized().emit(this.contentArea());
+
+          var size = this.size();
+          size.width = Math.max(size.width, borderMetrics.width);
+          size.height = Math.max(size.height, borderMetrics.height);
+
+          if (this._size.width !== size.width || this._size.height !== size.height) {
+            this.resize(size);
+          } else {
+            this.contentArea().onResized().emit(this.contentArea());
+          }
         }
 
         this.$().css('width', parseInt(this.$().css('width'), 10) + deltaWidth);
         this.$().css('height', parseInt(this.$().css('height'), 10) + deltaHeight);
-
-        borderMetrics = this.borderMetrics();
-        var size = this._size;
-        size.width = Math.max(size.width, borderMetrics.width);
-        size.height = Math.max(size.height, borderMetrics.height);
 
         return this;
       }
@@ -283,6 +287,8 @@ Superview = (function ($) {
           restricted = true;
         }
 
+        newSize.width = Math.max(borderMetrics.width, newSize.width);
+
         if (newSize.width !== size.width) {
           resized = true;
           size.width = newSize.width;
@@ -301,6 +307,8 @@ Superview = (function ($) {
           newSize.height = restrictions.maximum.height;
           restricted = true;
         }
+
+        newSize.height = Math.max(borderMetrics.height, newSize.height)
 
         if (newSize.height !== size.height) {
           resized = true;

@@ -1,24 +1,9 @@
-
-contentArea should have its own onMoved event which is emitted when the border size is changed (and when the boundary box is repositioned)
-
-
-> What happens when I resize a box smaller than its border allows?
-
-1:
-  
-  c: finish impl superview.restrictions INCL additional resize() AND moveTo() specs to prevent resizing and moving beyond restritions
-
--> remove the dependency on z() - it's not worth it for just one simple use case
-
 -> VISUAL_SPECS for constraints
 
   d: contentArea()
     > size changes when its superview's border is set
     > view.contentArea().[resize|moveTo|size|position|restrictTo|anchorTo]()
-    > reintroduce page/window specs
-  e: get rid of Superview#$() replace with elem() => HTMLElement
-  
-  
+    > reintroduce page/window specs  
   
 put restrictions() functionality in superview.restrictions and likewise for similar behaviour
 modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews have it)
