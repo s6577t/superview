@@ -15,7 +15,7 @@ describe('superview.css()', function () {
     expect(view.css({cursor: 'pointer'})).toBe(view);
   });
 
-  describe('size effects', function () {
+  describe('size() effects', function () {
 
     it("should maintain the size() of the superview", function() {
       view.resize({width: 100, height: 100});
@@ -82,7 +82,7 @@ describe('superview.css()', function () {
 
   });
   
-  describe('position effects', function () {
+  describe('position() effects', function () {
 
     it("should maintain the position() of the superview", function() {
 
@@ -227,6 +227,11 @@ describe('superview.css()', function () {
         view.css(css);
         expect(parseInt(view.css(setting), 10)).toEqual(5678);
       });
+    });
+  
+    it("should not allow the position to be changed from absolute", function() {
+      view.css('position', 'relative');
+      expect(view.css('position')).toEqual('absolute');
     });
   })
 })

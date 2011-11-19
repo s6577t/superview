@@ -1,27 +1,3 @@
-MAKE SPECS PASS the move on :)
-specs have been abstracted where possible, review all specs and write content area idiosyncratic specs as well as addtional integrations specs for:
-> contentArea event emissions in response to the resizing of the boundary box and vice-versa
-> contentArea event emissions for border size changes (which do not cause the boundary box to resize).
-
-THEN: introduce abstract box specs onto content area
-
-contentArea should have its own onResized event which is emitted when the border size is changed (and when the boundary box is resized)
-
-SPEC that the contentArea onResized/onMoved events are emitted when the boundary box is resize/moved and vice-versa
-
-CSS filtering for position ?! spec + implement
-
-
-> 
-
-
-
-
-
-
-
-
-
 
 contentArea should have its own onMoved event which is emitted when the border size is changed (and when the boundary box is repositioned)
 
@@ -87,5 +63,7 @@ modularize: viewtree+rect are standard, anchoring is a mixin (but all superviews
 > add presenter getter/setter
 > review controller setter/getter
 > filter CSS position to only allow absolute, and relative IFF the superview is a root. WHAT ABOUT position: fixed?
+
+> allow root superview to be position: relative
   
 READ ABOUT DERBYJS before doing supermodel

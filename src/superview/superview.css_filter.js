@@ -5,10 +5,11 @@ Superview.CssFilter = (function () {
   }
 
   var filters = [
-    /^margin.*/,
-    /^padding.*/,
-    /^(min|max).*$/,
-    /^(left|right|top|bottom|width|height)$/
+    /^margin.*/i,
+    /^padding.*/i,
+    /^(min|max).*$/i,
+    /^(left|right|top|bottom|width|height)$/i,
+    /^position$/i
   ];
 
   return {
