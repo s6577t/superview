@@ -514,80 +514,25 @@ Superview = (function ($) {
       position.bottom = position.top + this._size.height;
       return position;
     }
-
+    
+    , anchorTo: function () {
+      var self = this;
+      
+      return this;
+    }
+    
     , contentArea: function () {
-      return this._contentArea = this._contentArea || (function (superview) {
-        var contentArea = {
-          boundaryBox: function () {
-            return superview;
-          }
-          , size: function () {
-            var boundaryBoxSize = new Superview.Rect(superview.size());
-            return boundaryBoxSize.removeBorder(superview.borderMetrics()).flatten();
-          }
-          , resize: function (newSize, restrictionCallback) {
-
-            newSize = new Superview.Rect(newSize);
-            newSize.addBorder(superview.borderMetrics());
-
-            superview.resize(newSize.flatten(), restrictionCallback);
-
-            return this;
-          }
-          , position: function () {
-            var boundaryBoxPosition = new Superview.Rect(superview.position());
-            return boundaryBoxPosition.removeBorder(superview.borderMetrics()).flatten();
-          }
-          , moveTo: function (newPosition, restrictionCallback) {
-
-            newPosition = new Superview.Rect(newPosition);
-            newPosition.addBorder(superview.borderMetrics());
-
-            superview.moveTo(newPosition.flatten(), restrictionCallback);
-
-            return this;
-          }
-          , restrictTo: function (restrictions) {
-
-            restrictions = new Superview.Restrictions(restrictions);
-            var borderMetrics = superview.borderMetrics();
-
-            restrictions.minimum.addBorder(borderMetrics);
-            restrictions.maximum.addBorder(borderMetrics);
-
-            superview.restrictTo(restrictions.flatten());
-
-            return this;
-          }
-          , restrictions: function () {
-
-            var restrictions = new Superview.Restrictions(superview.restrictions());
-            var borderMetrics = superview.borderMetrics();
-
-            restrictions.minimum.removeBorder(borderMetrics);
-            restrictions.maximum.removeBorder(borderMetrics);
-
-            return restrictions.flatten();
-          }
-        };
-
-        eventify(contentArea).define(
-          'onMoved', // (source contentArea)
-          'onResized' // (source contentArea)
-        );
-
-        return contentArea;
-      })(this);
+      return this._contentArea = this._contentArea || new Superview.ContentArea(this);
     }
 
-    , anchorTo: function (otherView, anchoring) {
+    , xanchorTo: function (otherView, anchoring) {
       var self = this;
 
       if (self.anchoring()) self.deanchor();
 
       self._anchoring = anchoring;
       extend(anchoring).withObject({
-        otherView: otherView,
+        anchoredTo: otherView,
         anchorToOuterRect: !self.ancestors().contains(otherView),
         anchorOuterRect: true
       });

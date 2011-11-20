@@ -18,9 +18,9 @@ describe('superview content area box', function () {
       view.css({border: 'solid 5px red'});
     });
 
-    describe("superview.contentArea().boundaryBox()", function() {
+    describe("superview.contentArea().superview()", function() {
       it("should return the superview", function() {
-        expect(contentArea.boundaryBox()).toBe(view);
+        expect(contentArea.superview()).toBe(view);
       });
     });
 

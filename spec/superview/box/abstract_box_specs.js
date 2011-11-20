@@ -508,6 +508,14 @@ function boxSpecs (newBoxFunction) {
         }});
       });
     });
-
+    
+    describe("anchoring", function() {
+      
+      describe("anchorTo()", function() {
+        it("should be chainable", function() {
+          expect(box.anchorTo(new Superview, {})).toBe(box);
+        });
+      });
+    });
   }
 }

@@ -1,6 +1,10 @@
-!: Fix Firefox failing specs
+> NEED to revise Anchoring code architecture. then repass specs and continue on to spec other getUpdatedDimension typeof cases than 'string'(offset)
 
-3: calls to css() for top,left,right,bottom,width,height should result in a call to resize/moveTo
+
+> spec that NaN results in an invalid anchoring exception
+> spec that the return value of the function must be a number
+> offset string anchor should patch 
+
 4: reintroduce anchoring and fix fractional positioning bug (if it still exists?)
   > anchorTo restriction callback
   >: if I bind a box to the right of something and then resize it, it should still stick to the right
